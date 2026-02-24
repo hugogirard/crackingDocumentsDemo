@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Intelligence & Content Understanding Demo</title>
+
+    <!-- Fluent UI Web Components -->
+    <script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
+
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -13,13 +17,29 @@
 
     <!-- HEADER-COMPONENT: Extract to header.component -->
     <header class="app-header">
-        <h1>Document Intelligence & Content Understanding Demo</h1>
+        <div class="header-brand">
+            <svg class="brand-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                    fill="#0078d4" />
+                <path d="M14 2V8H20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M8 13H16M8 17H13" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <div class="header-text">
+                <fluent-text size="600" weight="semibold" class="header-title">
+                    Document Intelligence Demo
+                </fluent-text>
+                <fluent-text size="200" class="header-subtitle">
+                    AI-Powered Document Analysis
+                </fluent-text>
+            </div>
+        </div>
         <div class="service-selector">
-            <label for="serviceType">Analysis Service:</label>
-            <select id="serviceType" class="service-dropdown">
-                <option value="document-intelligence">Document Intelligence</option>
-                <option value="content-understanding">Content Understanding</option>
-            </select>
+            <fluent-text size="300" class="selector-label">Service:</fluent-text>
+            <fluent-select id="serviceType" class="service-dropdown">
+                <fluent-option value="document-intelligence" selected>Document Intelligence</fluent-option>
+                <fluent-option value="content-understanding">Content Understanding</fluent-option>
+            </fluent-select>
         </div>
     </header>
 
@@ -27,16 +47,51 @@
         <!-- SIDEBAR-COMPONENT: Extract to json-viewer.component -->
         <aside class="sidebar sidebar-left" id="jsonPanel">
             <div class="panel-header">
-                <h2>JSON Response</h2>
-                <button class="collapse-btn" id="collapseJsonBtn" aria-label="Toggle JSON panel">
-                    <span class="icon">◀</span>
-                </button>
+                <fluent-text size="400" weight="semibold">JSON Response</fluent-text>
+                <fluent-button appearance="stealth" id="collapseJsonBtn" aria-label="Toggle JSON panel"
+                    class="collapse-btn">
+                    <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M10.5 12L6.5 8L10.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" fill="none" />
+                    </svg>
+                </fluent-button>
+            </div>
+            <div class="collapsed-label">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M3 3H6V6H3V3ZM7 3H10V6H7V3ZM3 7H6V10H3V7ZM7 7H10V10H7V7ZM3 11H6V14H3V11ZM7 11H10V14H7V11Z"
+                        fill="currentColor" />
+                    <path d="M13 4L17 8M17 8L13 12M17 8H11" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" fill="none" />
+                </svg>
+                <span>JSON</span>
             </div>
             <div class="panel-content">
                 <div class="json-viewer" id="jsonViewer">
-                    <pre><code id="jsonContent">No document analyzed yet...</code></pre>
+                    <div class="empty-state">
+                        <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2"
+                                fill="none" />
+                            <path d="M16 20H24M16 28H32M16 36H28" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                            <path d="M36 24L40 28L36 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M44 24L48 28L44 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <fluent-text size="400" weight="semibold" class="empty-title">No Analysis Yet</fluent-text>
+                        <fluent-text size="300" class="empty-description">Upload and analyze a document to see the JSON
+                            response</fluent-text>
+                    </div>
+                    <pre style="display: none;"><code id="jsonContent">No document analyzed yet...</code></pre>
                 </div>
-                <button class="copy-btn" id="copyJsonBtn">Copy JSON</button>
+                <fluent-button appearance="accent" id="copyJsonBtn" class="copy-btn">
+                    <svg slot="start" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M11 3H13C13.55 3 14 3.45 14 4V14C14 14.55 13.55 15 13 15H6C5.45 15 5 14.55 5 14V12M3 1H10C10.55 1 11 1.45 11 2V10C11 10.55 10.55 11 10 11H3C2.45 11 2 10.55 2 10V2C2 1.45 2.45 1 3 1Z"
+                            stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    Copy to Clipboard
+                </fluent-button>
             </div>
         </aside>
 
@@ -44,19 +99,32 @@
         <main class="main-content">
             <!-- UPLOAD-SECTION: Part of chat.component or separate upload.component -->
             <div class="upload-section" id="uploadSection">
-                <div class="upload-area" id="uploadArea">
+                <fluent-card class="upload-area" id="uploadArea">
                     <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
                     <div class="upload-content">
                         <span class="upload-icon">📄</span>
-                        <p class="upload-text">Drag & drop a document here or click to browse</p>
-                        <p class="upload-subtext">Supported formats: PDF, JPEG, PNG</p>
+                        <fluent-text size="500" weight="semibold" class="upload-text">
+                            Drag & drop a document here or click to browse
+                        </fluent-text>
+                        <fluent-text size="300" class="upload-subtext">
+                            Supported formats: PDF, JPEG, PNG
+                        </fluent-text>
                     </div>
-                </div>
-                <div class="file-info" id="fileInfo" style="display: none;">
-                    <span class="file-name" id="fileName"></span>
-                    <button class="remove-file-btn" id="removeFileBtn">×</button>
-                </div>
-                <button class="analyze-btn" id="analyzeBtn" disabled>Analyze Document</button>
+                </fluent-card>
+                <fluent-card class="file-info" id="fileInfo" style="display: none;">
+                    <fluent-text weight="semibold" id="fileName"></fluent-text>
+                    <fluent-button appearance="stealth" id="removeFileBtn" class="remove-file-btn">
+                        ✕
+                    </fluent-button>
+                </fluent-card>
+                <fluent-button appearance="accent" size="large" id="analyzeBtn" disabled class="analyze-btn">
+                    <svg slot="start" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                            d="M8.5 3C5.46 3 3 5.46 3 8.5C3 11.54 5.46 14 8.5 14C9.83 14 11.05 13.5 12 12.7L15.3 16C15.69 16.39 16.31 16.39 16.7 16C17.09 15.61 17.09 14.99 16.7 14.6L13.4 11.3C14.2 10.35 14.7 9.13 14.7 7.8C14.7 4.76 11.54 3 8.5 3ZM8.5 5C10.43 5 12 6.57 12 8.5C12 10.43 10.43 12 8.5 12C6.57 12 5 10.43 5 8.5C5 6.57 6.57 5 8.5 5Z"
+                            fill="currentColor" />
+                    </svg>
+                    Analyze Document
+                </fluent-button>
             </div>
 
             <!-- CHAT-MESSAGES: Part of chat.component -->
@@ -66,34 +134,62 @@
                 </div>
 
                 <div class="chat-input-container">
-                    <textarea id="chatInput" class="chat-input" placeholder="Ask a question about the document..."
-                        rows="1"></textarea>
-                    <button class="send-btn" id="sendBtn" disabled>
-                        <span class="send-icon">➤</span>
-                    </button>
+                    <fluent-text-area id="chatInput" class="chat-input"
+                        placeholder="Ask a question about the document..." resize="vertical"
+                        rows="1"></fluent-text-area>
+                    <fluent-button appearance="accent" id="sendBtn" disabled class="send-btn" icon-only>
+                        <svg class="send-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.5 3L18.5 10L2.5 17L5.5 10L2.5 3Z" fill="currentColor" />
+                            <path d="M5.5 10H12" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </fluent-button>
                 </div>
             </div>
 
             <!-- LOADING-COMPONENT: Extract to loading-spinner.component -->
             <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-                <div class="spinner"></div>
-                <p class="loading-text">Processing document...</p>
+                <fluent-progress-ring class="spinner"></fluent-progress-ring>
+                <fluent-text size="400" class="loading-text">Processing document...</fluent-text>
             </div>
         </main>
 
         <!-- DOCUMENT-PREVIEW-COMPONENT: Extract to document-preview.component -->
         <aside class="sidebar sidebar-right" id="previewPanel">
             <div class="panel-header">
-                <h2>Document Preview</h2>
-                <button class="collapse-btn" id="collapsePreviewBtn" aria-label="Toggle preview panel">
-                    <span class="icon">▶</span>
-                </button>
+                <fluent-text size="400" weight="semibold">Document Preview</fluent-text>
+                <fluent-button appearance="stealth" id="collapsePreviewBtn" aria-label="Toggle preview panel"
+                    class="collapse-btn collapse-btn-right">
+                    <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M5.5 12L9.5 8L5.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" fill="none" />
+                    </svg>
+                </fluent-button>
+            </div>
+            <div class="collapsed-label collapsed-label-right">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"
+                        fill="none" />
+                    <path d="M7 7H13M7 10H13M7 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <span>PREVIEW</span>
             </div>
             <div class="panel-content">
                 <div class="document-preview" id="documentPreview">
                     <div class="preview-placeholder">
-                        <span class="preview-icon">📄</span>
-                        <p>No document loaded</p>
+                        <svg class="empty-icon" width="80" height="80" viewBox="0 0 80 80" fill="none">
+                            <path
+                                d="M20 10L50 10C52.2091 10 54 11.7909 54 14L54 66C54 68.2091 52.2091 70 50 70L20 70C17.7909 70 16 68.2091 16 66L16 14C16 11.7909 17.7909 10 20 10Z"
+                                stroke="currentColor" stroke-width="2.5" fill="none" />
+                            <path
+                                d="M50 10L50 24C50 26.2091 51.7909 28 54 28L64 28L64 66C64 68.2091 62.2091 70 60 70L54 70"
+                                stroke="currentColor" stroke-width="2.5" fill="none" />
+                            <path d="M50 10L64 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                            <path d="M26 24H44M26 32H44M26 40H44M26 48H38" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                        <fluent-text size="400" weight="semibold" class="empty-title">No Document</fluent-text>
+                        <fluent-text size="300" class="empty-description">Upload a document to preview it
+                            here</fluent-text>
                     </div>
                 </div>
             </div>

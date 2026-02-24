@@ -1,6 +1,25 @@
 # Document Intelligence & Content Understanding Demo
 
-A pure HTML/CSS/JavaScript web application for demonstrating Azure Document Intelligence and Content Understanding capabilities with LLM-powered document Q&A.
+A pure HTML/CSS/JavaScript web application built with **Microsoft Fluent UI** for demonstrating Azure Document Intelligence and Content Understanding capabilities with LLM-powered document Q&A.
+
+## ✨ Design System
+
+This application uses [**Fluent UI Web Components**](https://developer.microsoft.com/en-us/fluentui) - Microsoft's official design system. Fluent UI provides:
+
+- 🎨 **Modern Microsoft design language**: Consistent with Microsoft 365, Windows 11, and Azure Portal
+- ♿ **Accessibility built-in**: WCAG 2.1 compliant components with ARIA support
+- 🌙 **Theming support**: Light and dark mode ready
+- 🎯 **Web Components standard**: Framework-agnostic, works with any JavaScript framework
+- 📱 **Responsive**: Mobile-first design principles
+
+### Fluent UI Components Used
+
+- **fluent-button**: Primary, accent, and stealth button variants
+- **fluent-card**: Elevated surfaces for upload area and file info
+- **fluent-select**: Dropdown for service selection
+- **fluent-text**: Typography with size and weight variants
+- **fluent-text-area**: Auto-resizing text input for chat
+- **fluent-progress-ring**: Loading indicator
 
 ## Features
 
@@ -9,8 +28,9 @@ A pure HTML/CSS/JavaScript web application for demonstrating Azure Document Inte
 - 💬 **AI Chat**: Ask questions about your documents using LLM integration
 - 📊 **JSON Viewer**: View and copy the complete analysis response
 - 👁️ **Document Preview**: Side-by-side document viewing
-- 📱 **Responsive Design**: Works on desktop and mobile devices
+- 📱 **Responsive Design**: Works on desktop and mobile devices with Fluent UI components
 - 🎨 **Collapsible Panels**: Maximize workspace with collapsible side panels
+- 🌐 **No Build Step**: Pure HTML/CSS/JS with CDN-hosted Fluent UI
 
 ## Project Structure
 
@@ -330,6 +350,30 @@ class LLMService {
 
 ## Customization
 
+### Fluent UI Theming
+
+Fluent UI components can be customized using CSS custom properties (design tokens):
+
+```css
+/* In styles.css */
+:root {
+    /* Fluent UI Design Tokens */
+    --accent-base-color: #0078d4;
+    --neutral-base-color: #f3f2f1;
+}
+
+/* Customize specific components using ::part() */
+fluent-button::part(control) {
+    border-radius: 8px;
+}
+
+fluent-card::part(control) {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+```
+
+For comprehensive theming options, see the [Fluent UI Design Tokens documentation](https://docs.microsoft.com/en-us/fluent-ui/web-components/design-system/design-tokens).
+
 ### Colors (CSS Variables)
 
 Edit `:root` in `styles.css`:
@@ -353,12 +397,31 @@ Edit `:root` in `styles.css`:
 }
 ```
 
+### Dark Mode Support
+
+Fluent UI components automatically support dark mode. To enable dark mode, wrap your app in a design system provider:
+
+```html
+<fluent-design-system-provider use-defaults theme="dark">
+    <!-- Your app content -->
+</fluent-design-system-provider>
+```
+
 ## Browser Support
 
-- Chrome/Edge: ✅ Full support
-- Firefox: ✅ Full support
-- Safari: ✅ Full support
-- IE11: ❌ Not supported (uses modern ES6+ features)
+Fluent UI Web Components require modern browsers with Web Components support:
+
+- **Chrome/Edge**: ✅ Full support (recommended)
+- **Firefox**: ✅ Full support
+- **Safari**: ✅ Full support (14.1+)
+- **IE11**: ❌ Not supported (no Web Components support)
+
+For older browser support, you may need polyfills for:
+- Custom Elements v1
+- Shadow DOM v1
+- ES6+ features
+
+See [Fluent UI browser compatibility](https://github.com/microsoft/fluentui/tree/master/packages/web-components#browser-support) for details.
 
 ## Security Considerations
 

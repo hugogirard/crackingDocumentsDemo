@@ -370,7 +370,8 @@ class UploadController {
         this.currentFile = file;
         this.fileName.textContent = file.name;
         this.fileInfo.style.display = 'flex';
-        this.analyzeBtn.disabled = false;
+        // For Fluent UI button, remove disabled attribute
+        this.analyzeBtn.removeAttribute('disabled');
     }
 
     _handleRemoveFile(event) {
@@ -378,7 +379,8 @@ class UploadController {
         this.currentFile = null;
         this.fileInput.value = '';
         this.fileInfo.style.display = 'none';
-        this.analyzeBtn.disabled = true;
+        // For Fluent UI button, set disabled attribute
+        this.analyzeBtn.setAttribute('disabled', '');
     }
 
     async _handleAnalyze() {
@@ -415,33 +417,33 @@ class ChatController {
     _initializeEventListeners() {
         this.sendBtn.addEventListener('click', () => this._handleSendMessage());
         
+        // For Fluent UI text-area, listen to 'input' event
+        this.chatInput.addEventListener('input', (e) => {
+            const value = this.chatInput.value || '';
+            if (value.trim()) {
+                this.sendBtn.removeAttribute('disabled');
+            } else {
+                this.sendBtn.setAttribute('disabled', '');
+            }
+        });
+        
         this.chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 this._handleSendMessage();
             }
         });
-
-        this.chatInput.addEventListener('input', () => {
-            this._autoResize();
-            this.sendBtn.disabled = !this.chatInput.value.trim();
-        });
-    }
-
-    _autoResize() {
-        this.chatInput.style.height = 'auto';
-        this.chatInput.style.height = this.chatInput.scrollHeight + 'px';
     }
 
     async _handleSendMessage() {
-        const message = this.chatInput.value.trim();
+        const message = (this.chatInput.value || '').trim();
         if (!message) return;
 
         // Add user message
         this.addMessage(message, 'user');
         this.chatInput.value = '';
-        this.sendBtn.disabled = true;
-        this._autoResize();
+        // Disable send button for Fluent UI
+        this.sendBtn.setAttribute('disabled', '');
 
         try {
             // Get LLM response
@@ -495,6 +497,7 @@ class ChatController {
  */
 class JsonViewerController {
     constructor() {
+        this.jsonViewer = document.getElementById('jsonViewer');
         this.jsonContent = document.getElementById('jsonContent');
         this.copyBtn = document.getElementById('copyJsonBtn');
         this.panel = document.getElementById('jsonPanel');
@@ -512,6 +515,12 @@ class JsonViewerController {
     setData(data) {
         this.currentData = data;
         this.jsonContent.textContent = JSON.stringify(data, null, 2);
+        
+        // Show the code block, hide the empty state
+        const emptyState = this.jsonViewer.querySelector('.empty-state');
+        const preElement = this.jsonViewer.querySelector('pre');
+        if (emptyState) emptyState.style.display = 'none';
+        if (preElement) preElement.style.display = 'block';
     }
 
     _handleCopy() {
@@ -545,7 +554,15 @@ class DocumentPreviewController {
     }
 
     setDocument(file) {
-        this.previewContainer.innerHTML = '';
+        // Hide the empty state placeholder
+        const placeholder = this.previewContainer.querySelector('.preview-placeholder');
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+
+        // Clear any existing preview content
+        const existingContent = this.previewContainer.querySelectorAll('iframe, img');
+        existingContent.forEach(el => el.remove());
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -571,12 +588,15 @@ class DocumentPreviewController {
     }
 
     reset() {
-        this.previewContainer.innerHTML = `
-            <div class="preview-placeholder">
-                <span class="preview-icon">📄</span>
-                <p>No document loaded</p>
-            </div>
-        `;
+        // Clear any existing content
+        const existingContent = this.previewContainer.querySelectorAll('iframe, img');
+        existingContent.forEach(el => el.remove());
+        
+        // Show the empty state placeholder
+        const placeholder = this.previewContainer.querySelector('.preview-placeholder');
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+        }
     }
 }
 
