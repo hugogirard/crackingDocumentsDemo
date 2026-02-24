@@ -1,0 +1,12 @@
+[project]
+name = "modelbuilder"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "azure-ai-documentintelligence>=1.0.2",
+    "azure-identity>=1.25.2",
+    "azure-storage-blob>=12.28.0",
+    "python-dotenv>=1.2.1",
+]

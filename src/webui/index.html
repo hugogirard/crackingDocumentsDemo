@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Intelligence & Content Understanding Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- APP-ROOT: This entire body should become the app.component in Angular -->
+
+    <!-- HEADER-COMPONENT: Extract to header.component -->
+    <header class="app-header">
+        <h1>Document Intelligence & Content Understanding Demo</h1>
+        <div class="service-selector">
+            <label for="serviceType">Analysis Service:</label>
+            <select id="serviceType" class="service-dropdown">
+                <option value="document-intelligence">Document Intelligence</option>
+                <option value="content-understanding">Content Understanding</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- SIDEBAR-COMPONENT: Extract to json-viewer.component -->
+        <aside class="sidebar sidebar-left" id="jsonPanel">
+            <div class="panel-header">
+                <h2>JSON Response</h2>
+                <button class="collapse-btn" id="collapseJsonBtn" aria-label="Toggle JSON panel">
+                    <span class="icon">◀</span>
+                </button>
+            </div>
+            <div class="panel-content">
+                <div class="json-viewer" id="jsonViewer">
+                    <pre><code id="jsonContent">No document analyzed yet...</code></pre>
+                </div>
+                <button class="copy-btn" id="copyJsonBtn">Copy JSON</button>
+            </div>
+        </aside>
+
+        <!-- CHAT-COMPONENT: Extract to chat.component -->
+        <main class="main-content">
+            <!-- UPLOAD-SECTION: Part of chat.component or separate upload.component -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <div class="upload-content">
+                        <span class="upload-icon">📄</span>
+                        <p class="upload-text">Drag & drop a document here or click to browse</p>
+                        <p class="upload-subtext">Supported formats: PDF, JPEG, PNG</p>
+                    </div>
+                </div>
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <span class="file-name" id="fileName"></span>
+                    <button class="remove-file-btn" id="removeFileBtn">×</button>
+                </div>
+                <button class="analyze-btn" id="analyzeBtn" disabled>Analyze Document</button>
+            </div>
+
+            <!-- CHAT-MESSAGES: Part of chat.component -->
+            <div class="chat-section" id="chatSection" style="display: none;">
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+
+                <div class="chat-input-container">
+                    <textarea id="chatInput" class="chat-input" placeholder="Ask a question about the document..."
+                        rows="1"></textarea>
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <span class="send-icon">➤</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LOADING-COMPONENT: Extract to loading-spinner.component -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">Processing document...</p>
+            </div>
+        </main>
+
+        <!-- DOCUMENT-PREVIEW-COMPONENT: Extract to document-preview.component -->
+        <aside class="sidebar sidebar-right" id="previewPanel">
+            <div class="panel-header">
+                <h2>Document Preview</h2>
+                <button class="collapse-btn" id="collapsePreviewBtn" aria-label="Toggle preview panel">
+                    <span class="icon">▶</span>
+                </button>
+            </div>
+            <div class="panel-content">
+                <div class="document-preview" id="documentPreview">
+                    <div class="preview-placeholder">
+                        <span class="preview-icon">📄</span>
+                        <p>No document loaded</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- TOAST-NOTIFICATION-COMPONENT: Extract to notification.component -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
