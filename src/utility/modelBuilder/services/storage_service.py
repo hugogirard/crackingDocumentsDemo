@@ -53,8 +53,6 @@ class StorageService:
             start=start_time
         )
 
-        self.container_client.ge
-
         container_url = self.container_client.url
 
         return f'{container_url}?{sas_token}'

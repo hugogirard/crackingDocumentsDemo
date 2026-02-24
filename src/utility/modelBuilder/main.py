@@ -6,6 +6,7 @@ import logging
 def main():
     
     logging.basicConfig(level=logging.INFO)
+    
     # Disable Azure SDK logging
     logging.getLogger('azure').setLevel(logging.WARNING)
 
@@ -24,9 +25,9 @@ def main():
 
     storage_service.create_container()
 
-    #storage_service.upload_doc_intelligence_training_assets()
+    storage_service.upload_doc_intelligence_training_assets()
     
-    #logger.info('Creating document intelligence custom model')
+    logger.info('Creating document intelligence custom model')
 
     sas = storage_service.create_container_sas(config.storage_account_key)
         

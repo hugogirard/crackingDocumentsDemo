@@ -11,18 +11,12 @@ resource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {
 
 var suffix = uniqueString(rg.id)
 
-module docIntelligence 'br/public:avm/res/cognitive-services/account:0.14.1' = {
+module doc 'modules/docIntelligence.bicep' = {
   scope: rg
   name: 'docIntelligence'
   params: {
-    kind: 'FormRecognizer'
-    name: 'doc-${suffix}'
     location: mainLocation
-    publicNetworkAccess: 'Enabled'
-    disableLocalAuth: false
-    tags: {
-      SecurityControl: 'Ignore'
-    }
+    suffix: suffix
   }
 }
 
