@@ -4,6 +4,18 @@ param mainLocation string
 param contentUnderstandingLocation string
 param resourceGroupName string
 
+@description('The model for the chat completion')
+param chatCompleteionDeploymentName string
+
+@description('The SKU of the chat completion model')
+param chatDeploymentSku string
+
+@description('The properties of the chat model')
+param chatModelProperties object
+
+@description('The chat model SKU capacity')
+param chatModelSkuCapacity int
+
 resource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: resourceGroupName
   location: mainLocation
@@ -26,6 +38,18 @@ module project 'modules/foundry.bicep' = {
   params: {
     location: contentUnderstandingLocation
     suffix: suffix
+  }
+}
+
+module model 'modules/model.bicep' = {
+  scope: rg
+  params: {
+    aiFoundryAccountName: project.outputs.foundryResourceName
+    deploymentName: chatCompleteionDeploymentName
+    deploymentSku: chatDeploymentSku
+    modelProperties: chatModelProperties
+    skuCapacity: chatModelSkuCapacity
+    versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
   }
 }
 
