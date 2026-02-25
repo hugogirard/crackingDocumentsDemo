@@ -36,11 +36,70 @@ This application uses [**Fluent UI Web Components**](https://developer.microsoft
 
 ```
 src/webui/
-├── index.html          # Main HTML structure with Angular component markers
-├── styles.css          # Complete styling with CSS variables
-├── app.js             # Application logic with service layer architecture
-└── README.md          # This file
+├── index.html              # Main HTML structure
+├── styles.css              # Complete styling with CSS variables
+├── app.js                  # Application initialization
+├── config.js               # Configuration (API endpoints, settings)
+├── config.template.js      # Configuration template for setup
+├── API_DOCUMENTATION.md    # Backend API contract documentation
+├── services/               # Service layer (API calls)
+│   ├── azure-storage.service.js
+│   ├── document-intelligence.service.js
+│   ├── content-understanding.service.js
+│   ├── llm.service.js
+│   ├── notification.service.js
+│   └── loading.service.js
+├── controllers/            # UI Controllers
+│   ├── upload.controller.js
+│   ├── chat.controller.js
+│   ├── json-viewer.controller.js
+│   ├── document-preview.controller.js
+│   └── application.controller.js
+└── README.md              # This file
 ```
+
+## Setup
+
+### 1. Configure the Application
+
+Copy the configuration template and update with your backend API URL:
+
+```bash
+cp config.template.js config.js
+```
+
+Edit `config.js` and update the `apiBaseUrl`:
+
+```javascript
+const CONFIG = {
+    apiBaseUrl: 'http://localhost:8000/api', // Your backend API URL
+    // ... rest of config
+};
+```
+
+### 2. Backend API Requirements
+
+The frontend expects a backend API with the following endpoints. See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for detailed API specifications:
+
+- `POST /api/storage/get-sas-url` - Get SAS URL for file upload
+- `DELETE /api/storage/delete` - Delete file from storage
+- `POST /api/document-intelligence/analyze` - Analyze with Document Intelligence
+- `POST /api/content-understanding/analyze` - Analyze with Content Understanding
+- `POST /api/llm/chat` - Chat with LLM about document
+
+### 3. Upload Flow
+
+The application uses a two-step upload process:
+
+1. **Get SAS URL**: Frontend calls your backend API to get a SAS URL
+2. **Direct Upload**: Frontend uploads file directly to Azure Blob Storage using native browser fetch
+3. **Analysis**: Backend analyzes the uploaded file
+
+This approach:
+- ✅ Keeps API keys secure on the backend
+- ✅ Reduces backend bandwidth (direct upload to Azure)
+- ✅ Provides upload progress tracking
+- ✅ Scales better for large files
 
 ## Running the Application
 
@@ -68,35 +127,96 @@ npx http-server -p 8000
 
 ## Architecture
 
-### Service Layer (Ready for Angular Services)
+The application follows a clean separation of concerns with a service-oriented architecture:
 
-Each service class is designed to be easily converted to an Angular service:
+### Configuration Layer
 
-#### `AzureStorageService`
-- **Purpose**: Upload/delete files to Azure Blob Storage
-- **Angular Migration**: → `azure-storage.service.ts`
-- **Methods**:
-  - `uploadFile(file)`: Upload document to blob storage
-  - `deleteFile(blobName)`: Remove document from storage
+**config.js**
+- Central configuration for all API endpoints
+- Application settings (file size limits, timeouts)
+- Easy environment switching (dev/staging/prod)
 
-#### `DocumentIntelligenceService`
-- **Purpose**: Analyze documents with Azure Document Intelligence
-- **Angular Migration**: → `document-intelligence.service.ts`
-- **Methods**:
-  - `analyzeDocument(documentUrl)`: Extract data using Document Intelligence API
+### Service Layer
 
-#### `ContentUnderstandingService`
-- **Purpose**: Analyze documents with Azure Content Understanding
-- **Angular Migration**: → `content-understanding.service.ts`
-- **Methods**:
-  - `analyzeDocument(documentUrl)`: Extract data using Content Understanding API
+All services make API calls to a backend server. No direct Azure API calls from the frontend.
 
-#### `LLMService`
-- **Purpose**: Handle document Q&A with LLM
-- **Angular Migration**: → `llm.service.ts`
-- **Methods**:
+#### `AzureStorageService` → `services/azure-storage.service.js`
+- **Purpose**: Handle file uploads to Azure Blob Storage via backend API
+- **Key Methods**:
+  - `getSasUrl(fileName)`: Get SAS URL from backend
+  - `uploadFile(file)`: Upload using native browser fetch to SAS URL
+  - `uploadFileWithProgress(file, onProgress)`: Upload with progress tracking
+  - `deleteFile(blobName)`: Delete file via backend API
+- **Flow**:
+  1. Call backend API to get SAS URL
+  2. Upload file directly to Azure Storage using native browser fetch/XMLHttpRequest
+  3. Return blob URL for analysis
+
+#### `DocumentIntelligenceService` → `services/document-intelligence.service.js`
+- **Purpose**: Analyze documents with Azure Document Intelligence via backend API
+- **Key Methods**:
+  - `analyzeDocument(documentUrl, modelId)`: Analyze via URL
+  - `analyzeDocumentFromFile(file, modelId)`: Analyze via direct file upload
+  - `getModels()`: Get available models
+- **API Call**: POST to `/document-intelligence/analyze`
+
+#### `ContentUnderstandingService` → `services/content-understanding.service.js`
+- **Purpose**: Analyze documents with Azure Content Understanding via backend API
+- **Key Methods**:
+  - `analyzeDocument(documentUrl, modelId)`: Analyze via URL
+  - `analyzeDocumentFromFile(file, modelId)`: Analyze via direct file upload
+  - `getModels()`: Get available models
+- **API Call**: POST to `/content-understanding/analyze`
+
+#### `LLMService` → `services/llm.service.js`
+- **Purpose**: Handle document Q&A with LLM via backend API
+- **Key Methods**:
   - `setDocumentContext(data)`: Set analyzed document as context
-  - `askQuestion(question)`: Send question to LLM with document context
+  - `askQuestion(question)`: Send question to LLM
+  - `askQuestionStream(question, onChunk)`: Stream LLM responses
+  - `clearHistory()`: Reset conversation
+  - `getHistory()`: Get conversation history
+- **Features**:
+  - Maintains conversation history
+  - Supports streaming responses
+  - Includes document context in queries
+- **API Call**: POST to `/llm/chat`
+
+#### `NotificationService` → `services/notification.service.js`
+- **Purpose**: Display toast notifications
+- **Methods**: `show(message, type)`
+
+#### `LoadingService` → `services/loading.service.js`
+- **Purpose**: Control loading overlay
+- **Methods**: `show(message)`, `hide()`
+
+### Controller Layer
+
+UI controllers manage DOM interactions and user events:
+
+#### `UploadController` → `controllers/upload.controller.js`
+- File upload UI (drag-drop, file selection)
+- File validation
+- Upload triggering
+
+#### `ChatController` → `controllers/chat.controller.js`
+- Chat message display
+- User input handling
+- Message history management
+
+#### `JsonViewerController` → `controllers/json-viewer.controller.js`
+- JSON response display
+- Copy to clipboard functionality
+- Panel collapse/expand
+
+#### `DocumentPreviewController` → `controllers/document-preview.controller.js`
+- Document preview rendering (PDF/images)
+- Panel collapse/expand
+
+#### `Application` → `controllers/application.controller.js`
+- Main application orchestration
+- Service initialization
+- Workflow coordination
 
 ### UI Controllers (Ready for Angular Components)
 

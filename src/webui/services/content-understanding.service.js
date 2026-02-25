@@ -3,101 +3,99 @@
  */
 class ContentUnderstandingService {
     constructor() {
-        this.endpoint = 'https://your-content-understanding.cognitiveservices.azure.com/';
-        this.apiVersion = '2024-02-01';
+        this.config = CONFIG.contentUnderstanding;
+        this.apiBaseUrl = CONFIG.apiBaseUrl;
+        this.timeout = CONFIG.app.analysisTimeout;
     }
 
     /**
-     * Analyze document using Content Understanding (Mock implementation)
+     * Analyze document using Content Understanding
      * @param {string} documentUrl - URL of the document to analyze
+     * @param {string} modelId - Optional model ID (default: general-document)
      * @returns {Promise<Object>} Analysis result
      */
-    async analyzeDocument(documentUrl) {
+    async analyzeDocument(documentUrl, modelId = null) {
         console.log('Analyzing document with Content Understanding:', documentUrl);
         
-        await this._simulateDelay(2500);
-        
-        // Mock response with Content Understanding structure
-        return {
-            apiVersion: this.apiVersion,
-            modelId: 'general-document',
-            status: 'succeeded',
-            createdDateTime: new Date().toISOString(),
-            lastUpdatedDateTime: new Date().toISOString(),
-            analyzeResult: {
-                version: '4.0',
-                content: 'Sample document content with enhanced understanding...',
-                languages: [
-                    { locale: 'en-US', confidence: 0.99 }
-                ],
-                pages: [
-                    {
-                        pageNumber: 1,
-                        width: 8.5,
-                        height: 11,
-                        unit: 'inch',
-                        spans: [{ offset: 0, length: 500 }]
-                    }
-                ],
-                paragraphs: [
-                    {
-                        role: 'title',
-                        content: 'Invoice',
-                        boundingRegions: [{ pageNumber: 1, polygon: [1.0, 1.0, 3.0, 1.0, 3.0, 1.5, 1.0, 1.5] }]
-                    },
-                    {
-                        role: 'body',
-                        content: 'This invoice is for services rendered during February 2024.',
-                        boundingRegions: [{ pageNumber: 1, polygon: [1.0, 2.0, 7.0, 2.0, 7.0, 3.0, 1.0, 3.0] }]
-                    }
-                ],
-                tables: [
-                    {
-                        rowCount: 3,
-                        columnCount: 3,
-                        cells: [
-                            { rowIndex: 0, columnIndex: 0, content: 'Item', kind: 'columnHeader' },
-                            { rowIndex: 0, columnIndex: 1, content: 'Quantity', kind: 'columnHeader' },
-                            { rowIndex: 0, columnIndex: 2, content: 'Price', kind: 'columnHeader' }
-                        ]
-                    }
-                ],
-                entities: [
-                    {
-                        category: 'Organization',
-                        content: 'Acme Corporation',
-                        confidence: 0.95,
-                        spans: [{ offset: 50, length: 16 }]
-                    },
-                    {
-                        category: 'DateTime',
-                        content: 'February 2024',
-                        confidence: 0.92,
-                        spans: [{ offset: 100, length: 13 }]
-                    }
-                ],
-                keyValuePairs: [
-                    {
-                        key: { content: 'Invoice Number', spans: [{ offset: 0, length: 14 }] },
-                        value: { content: 'INV-12345', spans: [{ offset: 16, length: 9 }] },
-                        confidence: 0.96
-                    }
-                ],
-                documents: [
-                    {
-                        docType: 'invoice',
-                        fields: {
-                            'InvoiceId': { type: 'string', content: 'INV-12345', confidence: 0.96 },
-                            'CustomerName': { type: 'string', content: 'Acme Corporation', confidence: 0.95 },
-                            'InvoiceTotal': { type: 'currency', content: '$150.00', confidence: 0.97 }
-                        }
-                    }
-                ]
+        try {
+            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    documentUrl: documentUrl,
+                    modelId: modelId || this.config.modelId
+                }),
+                signal: AbortSignal.timeout(this.timeout)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Analysis failed: ${response.statusText}`);
             }
-        };
+
+            const result = await response.json();
+            console.log('Content Understanding analysis completed');
+            
+            return result;
+        } catch (error) {
+            console.error('Content Understanding error:', error);
+            throw error;
+        }
     }
 
-    _simulateDelay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    /**
+     * Analyze document from file directly
+     * @param {File} file - The file to analyze
+     * @param {string} modelId - Optional model ID
+     * @returns {Promise<Object>} Analysis result
+     */
+    async analyzeDocumentFromFile(file, modelId = null) {
+        console.log('Analyzing document file with Content Understanding:', file.name);
+        
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('modelId', modelId || this.config.modelId);
+
+            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/file`, {
+                method: 'POST',
+                body: formData,
+                signal: AbortSignal.timeout(this.timeout)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Analysis failed: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('Content Understanding analysis completed');
+            
+            return result;
+        } catch (error) {
+            console.error('Content Understanding error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get list of available models
+     * @returns {Promise<Array>} List of available models
+     */
+    async getModels() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/models`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to get models: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting models:', error);
+            throw error;
+        }
     }
 }

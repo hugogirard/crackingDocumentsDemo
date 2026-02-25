@@ -3,9 +3,10 @@
  */
 class LLMService {
     constructor() {
-        this.endpoint = 'https://your-openai.openai.azure.com/';
-        this.deploymentName = 'gpt-4';
+        this.config = CONFIG.llm;
+        this.apiBaseUrl = CONFIG.apiBaseUrl;
         this.documentContext = null;
+        this.conversationHistory = [];
     }
 
     /**
@@ -14,41 +15,141 @@ class LLMService {
      */
     setDocumentContext(documentData) {
         this.documentContext = documentData;
+        this.conversationHistory = []; // Reset conversation when new document is loaded
     }
 
     /**
-     * Send a question to the LLM about the document (Mock implementation)
+     * Send a question to the LLM about the document
      * @param {string} question - User's question
      * @returns {Promise<string>} LLM response
      */
     async askQuestion(question) {
         console.log('Sending question to LLM:', question);
         
-        await this._simulateDelay(1500);
-        
-        // Mock intelligent responses based on common questions
-        const responses = {
-            'invoice': 'Based on the analyzed document, this is an invoice (INV-12345) dated February 24, 2024, for Acme Corporation with a total amount of $150.00.',
-            'total': 'The total amount on this invoice is $150.00.',
-            'date': 'The invoice date is February 24, 2024.',
-            'customer': 'The customer name is Acme Corporation.',
-            'items': 'The document contains a table with items, quantities, and prices. The main item listed is Product A with a quantity of 2 at $50.00.',
-            'number': 'The invoice number is INV-12345.'
-        };
-        
-        // Simple keyword matching for demo
-        const lowerQuestion = question.toLowerCase();
-        for (const [keyword, response] of Object.entries(responses)) {
-            if (lowerQuestion.includes(keyword)) {
-                return response;
+        try {
+            // Add user message to history
+            this.conversationHistory.push({
+                role: 'user',
+                content: question
+            });
+
+            const response = await fetch(`${this.apiBaseUrl}${this.config.chatEndpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question: question,
+                    documentContext: this.documentContext,
+                    conversationHistory: this.conversationHistory,
+                    settings: {
+                        maxTokens: this.config.maxTokens,
+                        temperature: this.config.temperature
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `LLM request failed: ${response.statusText}`);
             }
+
+            const result = await response.json();
+            const answer = result.answer || result.response || result.message;
+
+            // Add assistant response to history
+            this.conversationHistory.push({
+                role: 'assistant',
+                content: answer
+            });
+
+            console.log('LLM response received');
+            return answer;
+        } catch (error) {
+            console.error('LLM error:', error);
+            throw error;
         }
-        
-        // Default response
-        return `Based on the document analysis, I can help you with information about this invoice. The document contains key details such as invoice number (INV-12345), customer information (Acme Corporation), date (February 24, 2024), and a total amount of $150.00. What specific information would you like to know?`;
     }
 
-    _simulateDelay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    /**
+     * Send a streaming question to the LLM
+     * @param {string} question - User's question
+     * @param {Function} onChunk - Callback for each chunk of response
+     * @returns {Promise<string>} Complete LLM response
+     */
+    async askQuestionStream(question, onChunk) {
+        console.log('Sending streaming question to LLM:', question);
+        
+        try {
+            this.conversationHistory.push({
+                role: 'user',
+                content: question
+            });
+
+            const response = await fetch(`${this.apiBaseUrl}${this.config.chatEndpoint}/stream`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question: question,
+                    documentContext: this.documentContext,
+                    conversationHistory: this.conversationHistory,
+                    settings: {
+                        maxTokens: this.config.maxTokens,
+                        temperature: this.config.temperature
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `LLM request failed: ${response.statusText}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullResponse = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                fullResponse += chunk;
+                
+                if (onChunk) {
+                    onChunk(chunk);
+                }
+            }
+
+            // Add assistant response to history
+            this.conversationHistory.push({
+                role: 'assistant',
+                content: fullResponse
+            });
+
+            console.log('LLM streaming response completed');
+            return fullResponse;
+        } catch (error) {
+            console.error('LLM streaming error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Clear conversation history
+     */
+    clearHistory() {
+        this.conversationHistory = [];
+    }
+
+    /**
+     * Get conversation history
+     * @returns {Array} Conversation history
+     */
+    getHistory() {
+        return this.conversationHistory;
     }
 }

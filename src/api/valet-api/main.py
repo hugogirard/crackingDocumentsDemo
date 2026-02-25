@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from service import StorageService
 from config import Config
 import logging
@@ -20,6 +21,14 @@ storage_service = StorageService(Config())
 app = FastAPI(title="ValetKey-API",
               description="Provide SAS token for the blob",
               version="1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get('/api/sas',description="Return a SAS for a specific blob")
 def get_sas_blob(blob_name:str) -> str:

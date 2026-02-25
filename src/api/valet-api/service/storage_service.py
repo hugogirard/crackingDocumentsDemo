@@ -23,7 +23,7 @@ class StorageService:
             container_name=blob.container_name,
             blob_name=blob.blob_name,
             account_key=self.account_key,
-            permission=BlobSasPermissions(write=True),
+            permission=BlobSasPermissions(write=True, create=True, read=True),
             expiry=expiry_time,
             start=start_time
         )

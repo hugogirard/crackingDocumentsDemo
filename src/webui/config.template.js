@@ -1,39 +1,34 @@
 const CONFIG = {
+    // API Base URL - Update this with your backend API URL
+    apiBaseUrl: 'http://localhost:8000/api', // Change to your actual backend URL
+    
     // Azure Storage Configuration
     storage: {
         accountName: 'YOUR_STORAGE_ACCOUNT_NAME',
         containerName: 'documents',
-        // Option 1: Use SAS token (not recommended for production)
-        sasToken: 'YOUR_SAS_TOKEN',
-        // Option 2: Use backend proxy endpoint
-        uploadEndpoint: 'https://your-backend.azurewebsites.net/api/upload'
+        // Backend endpoints for upload operations
+        getSasUrlEndpoint: '/storage/get-sas-url', // POST: Returns { sasUrl, blobUrl, blobName }
+        uploadEndpoint: '/storage/upload'
     },
 
     // Document Intelligence Configuration
     documentIntelligence: {
-        endpoint: 'https://YOUR_RESOURCE_NAME.cognitiveservices.azure.com/',
-        // Don't put API key here in production! Use backend proxy
-        apiKey: 'YOUR_API_KEY',
+        analyzeEndpoint: '/document-intelligence/analyze', // POST: { documentUrl, modelId }
         apiVersion: '2023-07-31',
         modelId: 'prebuilt-document' // or 'prebuilt-invoice', 'prebuilt-receipt', etc.
     },
 
     // Content Understanding Configuration
     contentUnderstanding: {
-        endpoint: 'https://YOUR_RESOURCE_NAME.cognitiveservices.azure.com/',
-        // Don't put API key here in production! Use backend proxy
-        apiKey: 'YOUR_API_KEY',
+        analyzeEndpoint: '/content-understanding/analyze', // POST: { documentUrl, modelId }
         apiVersion: '2024-02-01',
         modelId: 'general-document'
     },
 
-    // Azure OpenAI Configuration
-    openai: {
-        endpoint: 'https://YOUR_RESOURCE_NAME.openai.azure.com/',
-        // Don't put API key here in production! Use backend proxy
-        apiKey: 'YOUR_API_KEY',
+    // LLM Configuration
+    llm: {
+        chatEndpoint: '/llm/chat', // POST: { question, documentContext, conversationHistory }
         apiVersion: '2024-02-01',
-        deploymentName: 'gpt-4', // or 'gpt-35-turbo'
         maxTokens: 500,
         temperature: 0.7
     },
@@ -41,13 +36,17 @@ const CONFIG = {
     // Application Settings
     app: {
         maxFileSize: 10 * 1024 * 1024, // 10MB
-        allowedFileTypes: ['.pdf', '.jpg', '.jpeg', '.png'],
+        allowedFileTypes: ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'],
         uploadTimeout: 30000, // 30 seconds
         analysisTimeout: 60000 // 60 seconds
     }
 };
 
 // Export for use in app.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CONFIG;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CONFIG;
 }
