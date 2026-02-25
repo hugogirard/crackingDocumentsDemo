@@ -47,6 +47,10 @@ class AzureStorageService {
             const blobUrl = sasUrl.split('?')[0]; // Remove SAS token to get clean blob URL
             const blobName = file.name;
 
+            // Store SAS URL in state service for later use
+            stateService.setSasUrl(sasUrl, blobName);
+            stateService.setCurrentFileName(file.name);
+
             // Step 2: Upload file to Azure Blob Storage using native browser fetch
             const uploadResponse = await fetch(sasUrl, {
                 method: 'PUT',
@@ -66,6 +70,7 @@ class AzureStorageService {
             return {
                 success: true,
                 url: blobUrl,
+                sasUrl: sasUrl,
                 blobName: blobName || file.name,
                 uploadedAt: new Date().toISOString()
             };

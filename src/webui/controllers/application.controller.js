@@ -45,8 +45,14 @@ class Application {
                 NotificationService.show('Document analyzed with Content Understanding', 'success');
             }
 
+            // Store analysis result in state service
+            stateService.setAnalysisResult(analysisResult);
+
             // Display JSON
             this.jsonViewer.setData(analysisResult);
+
+            // Draw annotations on preview (if image)
+            this.previewController.setAnalysisData(analysisResult);
 
             // Set LLM context
             this.llmService.setDocumentContext(analysisResult);
@@ -72,5 +78,6 @@ class Application {
         this.previewController.reset();
         this.jsonViewer.setData(null);
         this.llmService.setDocumentContext(null);
+        stateService.clearAll();
     }
 }

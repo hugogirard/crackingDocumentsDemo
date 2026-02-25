@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from models import DocumentResponse, DocModel
 from config import Config
 from services import DocumentService
@@ -23,6 +24,14 @@ logger.addHandler(stream_handler)
 app = FastAPI(title="Document-API",
               description="Provide wrapper around AI service for Document API in Azure",
               version="1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post('/api/analyze', description="Analyze a document for a specific custom model")
 async def analyze(doc_info:DocumentInfo) -> DocumentResponse | None:

@@ -4,18 +4,22 @@
 class DocumentIntelligenceService {
     constructor() {
         this.config = CONFIG.documentIntelligence;
-        this.apiBaseUrl = CONFIG.apiBaseUrl;
+        this.apiBaseUrl = this.config.apiBaseUrl || CONFIG.apiBaseUrl;
         this.timeout = CONFIG.app.analysisTimeout;
     }
 
     /**
      * Analyze document using Document Intelligence
-     * @param {string} documentUrl - URL of the document to analyze
+     * @param {string} documentUrl - URL of the document to analyze (can be base URL or SAS URL)
      * @param {string} modelId - Optional model ID (default: prebuilt-document)
      * @returns {Promise<Object>} Analysis result
      */
     async analyzeDocument(documentUrl, modelId = null) {
-        console.log('Analyzing document with Document Intelligence:', documentUrl);
+        // Use the full SAS URL from state service if available
+        const sasUrl = stateService.getSasUrl();
+        const urlToAnalyze = sasUrl || documentUrl;
+        
+        console.log('Analyzing document with Document Intelligence:', urlToAnalyze);
         
         try {
             const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}`, {
@@ -24,8 +28,7 @@ class DocumentIntelligenceService {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    documentUrl: documentUrl,
-                    modelId: modelId || this.config.modelId
+                    url: urlToAnalyze
                 }),
                 signal: AbortSignal.timeout(this.timeout)
             });
