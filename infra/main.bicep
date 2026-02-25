@@ -21,27 +21,11 @@ module doc 'modules/docIntelligence.bicep' = {
 }
 
 /* Content understanding reside in foundry */
-module foundry 'br/public:avm/res/cognitive-services/account:0.14.1' = {
-  scope: rg
-  name: 'foundry'
-  params: {
-    kind: 'AIServices'
-    name: 'ai-${suffix}'
-    location: contentUnderstandingLocation
-    publicNetworkAccess: 'Enabled'
-    disableLocalAuth: false
-    allowProjectManagement: true
-    tags: {
-      SecurityControl: 'Ignore'
-    }
-  }
-}
-
-module project 'modules/project.bicep' = {
+module project 'modules/foundry.bicep' = {
   scope: rg
   params: {
     location: contentUnderstandingLocation
-    foundryResourceName: foundry.outputs.name
+    suffix: suffix
   }
 }
 
