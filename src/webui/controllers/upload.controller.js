@@ -90,10 +90,13 @@ class UploadController {
         if (!this.currentFile) return;
 
         try {
+            LoadingService.show('Uploading document...');
             const result = await this.storageService.uploadFile(this.currentFile);
+            LoadingService.hide();
             this.onUploadComplete(result, this.currentFile);
         } catch (error) {
             console.error('Upload error:', error);
+            LoadingService.hide();
             NotificationService.show('Failed to upload file', 'error');
         }
     }

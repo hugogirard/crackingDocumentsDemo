@@ -157,13 +157,41 @@
         <aside class="sidebar sidebar-right" id="previewPanel">
             <div class="panel-header">
                 <fluent-text size="400" weight="semibold">Document Preview</fluent-text>
-                <fluent-button appearance="stealth" id="collapsePreviewBtn" aria-label="Toggle preview panel"
-                    class="collapse-btn collapse-btn-right">
-                    <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M5.5 12L9.5 8L5.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round" fill="none" />
-                    </svg>
-                </fluent-button>
+                <div class="preview-controls">
+                    <fluent-button appearance="stealth" id="openInWindowBtn" aria-label="Open in new window"
+                        class="zoom-btn" disabled title="Open in new window for better quality">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M14 2H9V3H13V7H14V2ZM12.5 3.5L7 9L8 10L13.5 4.5L12.5 3.5Z" fill="currentColor" />
+                            <path d="M12 12H4V4H7V3H3V13H13V9H12V12Z" fill="currentColor" />
+                        </svg>
+                    </fluent-button>
+                    <fluent-button appearance="stealth" id="zoomOutBtn" aria-label="Zoom out" class="zoom-btn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </fluent-button>
+                    <fluent-text size="300" id="zoomLevel" class="zoom-level">100%</fluent-text>
+                    <fluent-button appearance="stealth" id="zoomInBtn" aria-label="Zoom in" class="zoom-btn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </fluent-button>
+                    <fluent-button appearance="stealth" id="zoomResetBtn" aria-label="Reset zoom" class="zoom-btn"
+                        disabled>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path
+                                d="M8 2C4.686 2 2 4.686 2 8C2 11.314 4.686 14 8 14C11.314 14 14 11.314 14 8C14 4.686 11.314 2 8 2ZM8 12C5.79 12 4 10.21 4 8C4 5.79 5.79 4 8 4C10.21 4 12 5.79 12 8C12 10.21 10.21 12 8 12Z"
+                                fill="currentColor" />
+                        </svg>
+                    </fluent-button>
+                    <fluent-button appearance="stealth" id="collapsePreviewBtn" aria-label="Toggle preview panel"
+                        class="collapse-btn collapse-btn-right">
+                        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.5 12L9.5 8L5.5 4" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        </svg>
+                    </fluent-button>
+                </div>
             </div>
             <div class="collapsed-label collapsed-label-right">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">

@@ -8,6 +8,7 @@ class StateService {
             BLOB_URL: 'document_blob_url',
             BLOB_NAME: 'document_blob_name',
             ANALYSIS_RESULT: 'analysis_result',
+            EXTRACTED_FIELDS: 'extracted_fields',
             CURRENT_FILE_NAME: 'current_file_name'
         };
     }
@@ -77,8 +78,14 @@ class StateService {
      */
     setAnalysisResult(analysisResult) {
         try {
+            // Store original result
             sessionStorage.setItem(this.KEYS.ANALYSIS_RESULT, JSON.stringify(analysisResult));
-            console.log('Analysis result stored in session storage');
+            
+            // Transform and store simplified extracted fields
+            const extractedFields = this.transformToExtractedFields(analysisResult);
+            sessionStorage.setItem(this.KEYS.EXTRACTED_FIELDS, JSON.stringify(extractedFields));
+            
+            console.log('Analysis result and extracted fields stored in session storage');
         } catch (error) {
             console.error('Error storing analysis result:', error);
         }
@@ -124,6 +131,57 @@ class StateService {
     }
 
     /**
+     * Transform analysis result to simplified extracted fields structure
+     * @param {Object} analysisResult - The analysis result from Document Intelligence
+     * @returns {Object} Simplified structure with field, value, confidence
+     */
+    transformToExtractedFields(analysisResult) {
+        if (!analysisResult || !analysisResult.fields) {
+            return {
+                doc_type: analysisResult?.doc_type || null,
+                overall_confidence: analysisResult?.confidence || null,
+                extracted_fields: []
+            };
+        }
+
+        const extractedFields = [];
+
+        // Transform each field
+        Object.entries(analysisResult.fields).forEach(([fieldName, fieldData]) => {
+            extractedFields.push({
+                field: fieldName,
+                value: fieldData.content || null,
+                confidence: fieldData.confidence || 0
+            });
+        });
+
+        // Sort by confidence descending
+        extractedFields.sort((a, b) => b.confidence - a.confidence);
+
+        return {
+            doc_type: analysisResult.doc_type,
+            overall_confidence: analysisResult.confidence,
+            extracted_fields: extractedFields,
+            total_fields: extractedFields.length,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    /**
+     * Get extracted fields in simplified format
+     * @returns {Object|null} The extracted fields or null
+     */
+    getExtractedFields() {
+        try {
+            const data = sessionStorage.getItem(this.KEYS.EXTRACTED_FIELDS);
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('Error retrieving extracted fields:', error);
+            return null;
+        }
+    }
+
+    /**
      * Clear all stored state
      */
     clearAll() {
@@ -143,6 +201,15 @@ class StateService {
      */
     hasStoredState() {
         return this.getSasUrl() !== null || this.getAnalysisResult() !== null;
+    }
+
+    /**
+     * Get simplified extracted fields as JSON string (ready to send to another service)
+     * @returns {string|null} JSON string of extracted fields
+     */
+    getExtractedFieldsAsJson() {
+        const fields = this.getExtractedFields();
+        return fields ? JSON.stringify(fields, null, 2) : null;
     }
 }
 
