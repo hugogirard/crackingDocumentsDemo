@@ -53,6 +53,28 @@ module model 'modules/model.bicep' = {
   }
 }
 
+module storageAccountFoundry 'br/public:avm/res/storage/storage-account:0.31.0' = {
+  scope: rg
+  name: 'storageAccountFoundry'
+  params: {
+    name: 'strf${replace(suffix,'-','')}'
+    kind: 'StorageV2'
+    skuName: 'Standard_LRS'
+    publicNetworkAccess: 'Enabled'
+    networkAcls: {
+      defaultAction: 'Allow'
+      ipRules: []
+      bypass: 'AzureServices'
+      virtualNetworkRules: []
+    }
+    allowBlobPublicAccess: true
+    allowSharedKeyAccess: true
+    tags: {
+      SecurityControl: 'Ignore'
+    }
+  }
+}
+
 /* Application Stack */
 module registry 'br/public:avm/res/container-registry/registry:0.10.0' = {
   scope: rg
@@ -94,6 +116,11 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = {
     allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     blobServices: {
+      containers: [
+        {
+          name: 'upload'
+        }
+      ]
       corsRules: [
         {
           allowedOrigins: ['https://documentintelligence.ai.azure.com']
