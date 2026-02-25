@@ -1,0 +1,35 @@
+name: Create Infrastructure
+
+on:
+    workflow_dispatch:
+
+jobs:
+    create-azure-resources:
+        env:
+            REGION: "canadacentral" # You can change this to reflect the region where you deploy your Accelerator
+            AZURE_CORE_OUTPUT: "none" # Test
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Azure Login
+              uses: Azure/login@v2
+              with:
+                  creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+            # Temp fix
+            # - name: bicep tmp fix
+            #   run: az config set bicep.use_binary_from_path=false
+
+            - name: deploy
+              id: createResources
+              run: |
+                  az deployment sub create \
+                    --location ${{ env.REGION }} \
+                    --name ${{ github.run_id }} \
+                    --template-file ./infra/main.bicep \
+                    --parameters ./infra/main.bicepparam \
+                    --query 'properties.outputs' \
+                    --output json > outputs.json

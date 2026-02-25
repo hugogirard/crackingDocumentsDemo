@@ -36,6 +36,37 @@ module foundry 'br/public:avm/res/cognitive-services/account:0.14.1' = {
   }
 }
 
+module project 'modules/project.bicep' = {
+  scope: rg
+  params: {
+    location: contentUnderstandingLocation
+    foundryResourceName: foundry.outputs.name
+  }
+}
+
+/* Application Stack */
+module registry 'br/public:avm/res/container-registry/registry:0.10.0' = {
+  scope: rg
+  params: {
+    name: 'acr${toLower(replace(suffix,'-',''))}'
+    location: mainLocation
+    publicNetworkAccess: 'Enabled'
+    acrAdminUserEnabled: true
+    acrSku: 'Standard'
+    tags: {
+      SecurityControl: 'Ignore'
+    }
+  }
+}
+
+module serverFarm 'modules/serverFarm.bicep' = {
+  scope: rg
+  params: {
+    location: mainLocation
+    suffix: suffix
+  }
+}
+
 /* Storage to upload training documents */
 module storageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = {
   scope: rg
@@ -59,6 +90,13 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = {
           allowedOrigins: ['https://documentintelligence.ai.azure.com']
           allowedHeaders: ['*']
           allowedMethods: ['CONNECT', 'DELETE', 'GET', 'HEAD', 'MERGE', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
+          exposedHeaders: ['*']
+          maxAgeInSeconds: 120
+        }
+        {
+          allowedOrigins: ['http://localhost:5500']
+          allowedHeaders: ['*']
+          allowedMethods: ['OPTIONS', 'PUT']
           exposedHeaders: ['*']
           maxAgeInSeconds: 120
         }
