@@ -24,7 +24,7 @@ app = FastAPI(title="Document-API",
               description="Provide wrapper around AI service for Document API in Azure",
               version="1.0")
 
-@app.post('/api/analyze')
+@app.post('/api/analyze', description="Analyze a document for a specific custom model")
 async def analyze(doc_info:DocumentInfo) -> DocumentResponse | None:
     try:
         return await document_service.start_analyzing(doc_info.url)
@@ -32,7 +32,7 @@ async def analyze(doc_info:DocumentInfo) -> DocumentResponse | None:
         logger.error(err)
         raise HTTPException(status_code=500, detail='Internal Server Error')
 
-@app.get('/api/models')
+@app.get('/api/models', description="Return the list of all availables model")
 async def get_models() -> List[DocModel]:
     try:
         return await document_service.get_models()
