@@ -30,6 +30,7 @@ module foundry 'br/public:avm/res/cognitive-services/account:0.14.1' = {
     location: contentUnderstandingLocation
     publicNetworkAccess: 'Enabled'
     disableLocalAuth: false
+    allowProjectManagement: true
     tags: {
       SecurityControl: 'Ignore'
     }
