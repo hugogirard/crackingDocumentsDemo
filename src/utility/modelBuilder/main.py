@@ -1,6 +1,7 @@
 from azure.ai.documentintelligence.models import DocumentModelDetails
-from services import DocumentService, StorageService
+from services import DocumentService, StorageService, ContentUnderstandingClient
 from config import Config
+from logging import Logger
 import logging
 
 def main():
@@ -11,6 +12,23 @@ def main():
     logging.getLogger('azure').setLevel(logging.WARNING)
 
     logger = logging.getLogger(__name__)
+
+    #configure_document_intelligence(logger=locals)
+
+    configure_content_understanding(logger)
+
+def configure_content_understanding(logger:Logger):    
+    client = ContentUnderstandingClient(Config())
+    
+    defaults = client.set_defaults()
+    
+    logger.info(defaults)
+
+    custom_model = client.create_custom_model()
+
+    logger.info(custom_model)
+
+def configure_document_intelligence(logger:Logger):
 
     config = Config()
 
@@ -33,7 +51,7 @@ def main():
         
     result = document_service.create_custom_model(model_id="custom_invoice",
                                                   description="Custom Invoice Model",
-                                                  container_sas_url=sas)
-        
+                                                  container_sas_url=sas)    
+
 if __name__ == "__main__":
     main()

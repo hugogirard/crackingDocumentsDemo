@@ -19,10 +19,6 @@ jobs:
               with:
                   creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-            # Temp fix
-            # - name: bicep tmp fix
-            #   run: az config set bicep.use_binary_from_path=false
-
             - name: deploy
               id: createResources
               run: |
@@ -33,3 +29,21 @@ jobs:
                     --parameters ./infra/main.bicepparam \
                     --query 'properties.outputs' \
                     --output json > outputs.json
+
+                  echo "documentIntelligenceEndpoint=$(jq -r '.documentIntelligenceEndpoint.value' outputs.json)" >> $GITHUB_OUTPUT
+                  echo "contentUnderstandingEndpoint=$(jq -r '.contentUnderstandingEndpoint.value' outputs.json)" >> $GITHUB_OUTPUT
+                  echo "resourceGroupName=$(jq -r '.resourceGroupName.value' outputs.json)" >> $GITHUB_OUTPUT
+                  echo "storageTrainingResourceName=$(jq -r '.storageTrainingResourceName.value' outputs.json)" >> $GITHUB_OUTPUT
+
+            - name: Get STORAGE Connection String
+              id: getStorageCnxString
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  CONNECTION_STRING=$(az storage account show-connection-string \
+                    --name ${{ steps.createResources.outputs.storageTrainingResourceName }} \
+                    --resource-group ${{ steps.createResources.outputs.resourceGroupName }} \
+                    --query connectionString \
+                    --output tsv)
+
+                  gh secret set STORAGE_CONNECTION_STRING --body "$CONNECTION_STRING" --repo ${{ github.repository }}

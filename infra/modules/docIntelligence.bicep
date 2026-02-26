@@ -26,3 +26,5 @@ resource doc 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     }
   }
 }
+
+output resourceName string = doc.name

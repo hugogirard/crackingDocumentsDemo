@@ -16,3 +16,7 @@ class Config:
     @property
     def model_id(self) -> str:
         return 'custom_invoice'
+    
+    @property
+    def token_endpoint(self) -> str:
+        return 'https://cognitiveservices.azure.com/.default'

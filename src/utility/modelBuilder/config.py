@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import json
 
 class Config:
 
@@ -29,3 +30,18 @@ class Config:
     @property
     def doc_intelligence_training_container(self) -> str:
         return os.getenv('DOC_INTELLIGENCE_TRAINING_CONTAINER')
+    
+    @property
+    def token_endpoint(self) -> str:
+        return 'https://cognitiveservices.azure.com/.default'
+    
+    @property
+    def content_understanding_endpoint(self) -> str:
+        return os.getenv('CONTENT_UNDERSTANDING_ENDPOINT')
+    
+    @property
+    def model_deployments(self) -> str:
+        deployments = json.loads(os.getenv("MODEL_DEPLOYMENTS"))
+        return {
+            "modelDeployments": deployments
+        }

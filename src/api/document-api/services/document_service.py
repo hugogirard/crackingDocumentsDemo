@@ -15,22 +15,6 @@ class DocumentService:
                                                                      credential=AzureKeyCredential(config.document_intelligence_key))
         self.model_id = config.model_id
 
-    def _convert_field(self, field: Any) -> DocumentField:
-        """Convert Azure DI field to our DocumentField model."""
-        field_data = {
-            'content': getattr(field, 'content', None),
-            'confidence': getattr(field, 'confidence', None),
-        }
-        
-        # Convert bounding regions
-        if bounding_regions := getattr(field, 'bounding_regions', None):
-            field_data['bounding_regions'] = [
-                BoundingRegion(page_number=r.page_number, polygon=r.polygon)
-                for r in bounding_regions
-            ]
-        
-        return DocumentField(**field_data)
-
     async def start_analyzing(self,url_document:str) -> DocumentResponse | None:
 
         request = AnalyzeDocumentRequest(url_source=url_document)
@@ -68,3 +52,19 @@ class DocumentService:
             doc_models.append(DocModel(model_id=doc.model_id,description=doc.description))
 
         return doc_models
+    
+    def _convert_field(self, field: Any) -> DocumentField:
+        """Convert Azure DI field to our DocumentField model."""
+        field_data = {
+            'content': getattr(field, 'content', None),
+            'confidence': getattr(field, 'confidence', None),
+        }
+        
+        # Convert bounding regions
+        if bounding_regions := getattr(field, 'bounding_regions', None):
+            field_data['bounding_regions'] = [
+                BoundingRegion(page_number=r.page_number, polygon=r.polygon)
+                for r in bounding_regions
+            ]
+        
+        return DocumentField(**field_data)    
