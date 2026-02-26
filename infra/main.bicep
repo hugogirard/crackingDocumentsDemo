@@ -33,7 +33,7 @@ module doc 'modules/docIntelligence.bicep' = {
 }
 
 /* Content understanding reside in foundry */
-module project 'modules/foundry.bicep' = {
+module foundry 'modules/foundry.bicep' = {
   scope: rg
   params: {
     location: contentUnderstandingLocation
@@ -44,7 +44,7 @@ module project 'modules/foundry.bicep' = {
 module model 'modules/model.bicep' = {
   scope: rg
   params: {
-    aiFoundryAccountName: project.outputs.foundryResourceName
+    aiFoundryAccountName: foundry.outputs.foundryResourceName
     deploymentName: chatCompleteionDeploymentName
     deploymentSku: chatDeploymentSku
     modelProperties: chatModelProperties
@@ -72,6 +72,15 @@ module storageAccountFoundry 'br/public:avm/res/storage/storage-account:0.31.0' 
     tags: {
       SecurityControl: 'Ignore'
     }
+  }
+}
+
+module connection 'modules/connections.bicep' = {
+  scope: rg
+  params: {
+    foundryResourceName: foundry.outputs.foundryResourceName
+    storageResourceId: storageAccountFoundry.outputs.resourceId
+    storageResourceName: storageAccountFoundry.outputs.name
   }
 }
 
