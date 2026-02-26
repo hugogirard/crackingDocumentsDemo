@@ -196,6 +196,8 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = {
 
 // output variables
 output documentIntelligenceEndpoint string = 'https://${doc.outputs.resourceName}.cognitiveservices.azure.com/'
+output documentIntelligenceResourceName string = doc.outputs.resourceName
 output contentUnderstandingEndpoint string = 'https://${foundry.outputs.foundryResourceName}.services.ai.azure.com/'
+output contentUnderstandingResourceName string = foundry.outputs.foundryResourceName
 output resourceGroupName string = rg.name
 output storageTrainingResourceName string = storageAccountFoundry.outputs.name
