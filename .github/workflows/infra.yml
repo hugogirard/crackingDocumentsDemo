@@ -47,3 +47,36 @@ jobs:
                     --output tsv)
 
                   gh secret set STORAGE_CONNECTION_STRING --body "$CONNECTION_STRING" --repo ${{ github.repository }}
+
+            - name: Get STORAGE Account Key
+              id: getStorageKey
+              env:
+                  GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+              run: |
+                  STORAGE_KEY=$(az storage account keys list \
+                    --account-name ${{ steps.createResources.outputs.storageTrainingResourceName }} \
+                    --resource-group ${{ steps.createResources.outputs.resourceGroupName }} \
+                    --query '[0].value' \
+                    --output tsv)
+
+                  gh secret set STORAGE_ACCOUNT_KEY --body "$STORAGE_KEY" --repo ${{ github.repository }}
+
+            - name: Save Document Intelligence Endpoint and API Key
+              id: saveDocIntelligence
+              env:
+                  GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+              run: |
+                  # Save Document Intelligence Endpoint
+                  gh secret set DOCUMENT_INTELLIGENCE_ENDPOINT --body "${{ steps.createResources.outputs.documentIntelligenceEndpoint }}" --repo ${{ github.repository }}
+
+                  # Get and save Document Intelligence API Key
+                  DOC_INTEL_KEY=$(az cognitiveservices account keys list \
+                    --name $(az cognitiveservices account list \
+                      --resource-group ${{ steps.createResources.outputs.resourceGroupName }} \
+                      --query "[?kind=='FormRecognizer' || kind=='CognitiveServices'].name | [0]" \
+                      --output tsv) \
+                    --resource-group ${{ steps.createResources.outputs.resourceGroupName }} \
+                    --query 'key1' \
+                    --output tsv)
+
+                  gh secret set DOCUMENT_INTELLIGENCE_API_KEY --body "$DOC_INTEL_KEY" --repo ${{ github.repository }}
