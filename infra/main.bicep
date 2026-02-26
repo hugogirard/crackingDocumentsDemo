@@ -21,6 +21,16 @@ param chatModelSkuCapacity int
 var modelContentUnderstanding = {
   chatModels: [
     {
+      deploymentName: 'gpt-5-mini'
+      deploymentSku: 'GlobalStandard'
+      modelProperties: {
+        format: 'OpenAI'
+        name: 'gpt-5-mini'
+        version: '2025-08-07'
+      }
+      skuCapacity: 150
+    }
+    {
       deploymentName: 'gpt-4.1'
       deploymentSku: 'GlobalStandard'
       modelProperties: {
@@ -61,17 +71,17 @@ module foundry 'modules/foundry.bicep' = {
   }
 }
 
-module model 'modules/model.bicep' = {
-  scope: rg
-  params: {
-    aiFoundryAccountName: foundry.outputs.foundryResourceName
-    deploymentName: chatCompleteionDeploymentName
-    deploymentSku: chatDeploymentSku
-    modelProperties: chatModelProperties
-    skuCapacity: chatModelSkuCapacity
-    versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
-  }
-}
+// module model 'modules/model.bicep' = {
+//   scope: rg
+//   params: {
+//     aiFoundryAccountName: foundry.outputs.foundryResourceName
+//     deploymentName: chatCompleteionDeploymentName
+//     deploymentSku: chatDeploymentSku
+//     modelProperties: chatModelProperties
+//     skuCapacity: chatModelSkuCapacity
+//     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
+//   }
+// }
 
 // Content Understanding model
 module contentChatModels 'modules/model.bicep' = [
