@@ -11,9 +11,6 @@ jobs:
 
         runs-on: ubuntu-latest
 
-        outputs:
-            contentUnderstandingEndpoint: ${{ steps.createResources.outputs.contentUnderstandingEndpoint }}
-
         steps:
             - uses: actions/checkout@v6
 
@@ -37,6 +34,14 @@ jobs:
                   echo "contentUnderstandingEndpoint=$(jq -r '.contentUnderstandingEndpoint.value' outputs.json)" >> $GITHUB_OUTPUT
                   echo "resourceGroupName=$(jq -r '.resourceGroupName.value' outputs.json)" >> $GITHUB_OUTPUT
                   echo "storageTrainingResourceName=$(jq -r '.storageTrainingResourceName.value' outputs.json)" >> $GITHUB_OUTPUT
+
+            - name: Set Secrets
+              id: setSecrets
+              env:
+                  GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+              run: |
+                  gh secret set CONTENT_UNDERSTANDING_ENDPOINT --body "${{ steps.createResources.outputs.contentUnderstandingEndpoint }}" --repo ${{ github.repository }}
+                  gh secret set DOCUMENT_INTELLIGENCE_ENDPOINT --body "${{ steps.createResources.outputs.documentIntelligenceEndpoint }}" --repo ${{ github.repository }}
 
             - name: Get STORAGE Connection String
               id: getStorageCnxString
@@ -69,9 +74,7 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.PAT_TOKEN }}
               run: |
-                  # Save Document Intelligence Endpoint
-                  gh secret set DOCUMENT_INTELLIGENCE_ENDPOINT --body "${{ steps.createResources.outputs.documentIntelligenceEndpoint }}" --repo ${{ github.repository }}
-
+                  # Save Document Intelligence Endpoint                  
                   # Get and save Document Intelligence API Key
                   DOC_INTEL_KEY=$(az cognitiveservices account keys list \
                     --name $(az cognitiveservices account list \
@@ -84,7 +87,7 @@ jobs:
 
                   gh secret set DOCUMENT_INTELLIGENCE_API_KEY --body "$DOC_INTEL_KEY" --repo ${{ github.repository }}
 
-    build-models:
+    build-custom-models:
         needs: create-azure-resources
         runs-on: ubuntu-latest
 
@@ -97,7 +100,7 @@ jobs:
             STORAGE_CONNECTION_STRING: ${{ secrets.STORAGE_CONNECTION_STRING }}
             STORAGE_ACCOUNT_KEY: ${{ secrets.STORAGE_ACCOUNT_KEY }}
             DOC_INTELLIGENCE_TRAINING_CONTAINER: "docinttraning"
-            CONTENT_UNDERSTANDING_ENDPOINT: ${{ needs.create-azure-resources.outputs.contentUnderstandingEndpoint }}
+            CONTENT_UNDERSTANDING_ENDPOINT: ${{ secrets.CONTENT_UNDERSTANDING_ENDPOINT }}
             MODEL_DEPLOYMENTS: '{"gpt-4.1":"gpt-4.1","gpt-4.1-mini":"gpt-4.1-mini","text-embedding-3-large":"text-embedding-3-large"}'
 
         steps:
