@@ -38,7 +38,7 @@ jobs:
             - name: Get STORAGE Connection String
               id: getStorageCnxString
               env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GH_TOKEN: ${{ secrets.PAT_TOKEN }}
               run: |
                   CONNECTION_STRING=$(az storage account show-connection-string \
                     --name ${{ steps.createResources.outputs.storageTrainingResourceName }} \
