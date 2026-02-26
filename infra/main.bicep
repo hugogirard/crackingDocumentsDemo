@@ -16,6 +16,26 @@ param chatModelProperties object
 @description('The chat model SKU capacity')
 param chatModelSkuCapacity int
 
+// **** Model for Content Understanding Custom Task *****
+
+var modelContentUnderstanding = {
+  chatModels: [
+    {
+      deploymentName: 'gpt-4.1'
+      deploymentSku: 'GlobalStandard'
+      modelProperties: {
+        format: 'OpenAI'
+        name: 'gpt-4.1'
+        version: '2025-04-14'
+      }
+      skuCapacity: 120
+    }
+  ]
+  embeddingModel: {}
+}
+
+// *******************************************************
+
 resource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: resourceGroupName
   location: mainLocation
@@ -52,6 +72,21 @@ module model 'modules/model.bicep' = {
     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
   }
 }
+
+// Content Understanding model
+module contentChatModels 'modules/model.bicep' = [
+  for model in modelContentUnderstanding.chatModels: {
+    scope: rg
+    params: {
+      aiFoundryAccountName: foundry.outputs.foundryResourceName
+      deploymentName: model.deploymentName
+      deploymentSku: model.deploymentSku
+      modelProperties: model.modelProperties
+      skuCapacity: model.skuCapacity
+      versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
+    }
+  }
+]
 
 module storageAccountFoundry 'br/public:avm/res/storage/storage-account:0.31.0' = {
   scope: rg
