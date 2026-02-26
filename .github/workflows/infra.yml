@@ -11,6 +11,9 @@ jobs:
 
         runs-on: ubuntu-latest
 
+        outputs:
+            contentUnderstandingEndpoint: ${{ steps.createResources.outputs.contentUnderstandingEndpoint }}
+
         steps:
             - uses: actions/checkout@v6
 
@@ -80,3 +83,35 @@ jobs:
                     --output tsv)
 
                   gh secret set DOCUMENT_INTELLIGENCE_API_KEY --body "$DOC_INTEL_KEY" --repo ${{ github.repository }}
+
+    build-models:
+        needs: create-azure-resources
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+
+        env:
+            DOCUMENT_INTELLIGENCE_ENDPOINT: ${{ secrets.DOCUMENT_INTELLIGENCE_ENDPOINT }}
+            DOCUMENT_INTELLIGENCE_API_KEY: ${{ secrets.DOCUMENT_INTELLIGENCE_API_KEY }}
+            STORAGE_CONNECTION_STRING: ${{ secrets.STORAGE_CONNECTION_STRING }}
+            STORAGE_ACCOUNT_KEY: ${{ secrets.STORAGE_ACCOUNT_KEY }}
+            DOC_INTELLIGENCE_TRAINING_CONTAINER: "docinttraning"
+            CONTENT_UNDERSTANDING_ENDPOINT: ${{ needs.create-azure-resources.outputs.contentUnderstandingEndpoint }}
+            MODEL_DEPLOYMENTS: '{"gpt-4.1":"gpt-4.1","gpt-4.1-mini":"gpt-4.1-mini","text-embedding-3-large":"text-embedding-3-large"}'
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
+              with:
+                  python-version: "3.10"
+
+            - name: Install dependencies
+              working-directory: src/utility/modelBuilder
+              run: uv sync
+
+            - name: Run model builder
+              working-directory: src/utility/modelBuilder
+              run: uv run python main.py
