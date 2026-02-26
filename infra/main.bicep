@@ -4,21 +4,9 @@ param mainLocation string
 param contentUnderstandingLocation string
 param resourceGroupName string
 
-@description('The model for the chat completion')
-param chatCompleteionDeploymentName string
+// **** Model for Content Understanding Custom Task and ChatAgent *****
 
-@description('The SKU of the chat completion model')
-param chatDeploymentSku string
-
-@description('The properties of the chat model')
-param chatModelProperties object
-
-@description('The chat model SKU capacity')
-param chatModelSkuCapacity int
-
-// **** Model for Content Understanding Custom Task *****
-
-var modelContentUnderstanding = {
+var models = {
   chatModels: [
     {
       deploymentName: 'gpt-5-mini'
@@ -40,8 +28,27 @@ var modelContentUnderstanding = {
       }
       skuCapacity: 120
     }
+    {
+      deploymentName: 'gpt-4.1-mini'
+      deploymentSku: 'GlobalStandard'
+      modelProperties: {
+        format: 'OpenAI'
+        name: 'gpt-4.1-mini'
+        version: '2025-04-14'
+      }
+      skuCapacity: 250
+    }
+    {
+      deploymentName: 'text-embedding-3-large'
+      deploymentSku: 'GlobalStandard'
+      modelProperties: {
+        format: 'OpenAI'
+        name: 'text-embedding-3-large'
+        version: '1'
+      }
+      skuCapacity: 150
+    }
   ]
-  embeddingModel: {}
 }
 
 // *******************************************************
@@ -71,22 +78,10 @@ module foundry 'modules/foundry.bicep' = {
   }
 }
 
-// module model 'modules/model.bicep' = {
-//   scope: rg
-//   params: {
-//     aiFoundryAccountName: foundry.outputs.foundryResourceName
-//     deploymentName: chatCompleteionDeploymentName
-//     deploymentSku: chatDeploymentSku
-//     modelProperties: chatModelProperties
-//     skuCapacity: chatModelSkuCapacity
-//     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
-//   }
-// }
-
 // Content Understanding model
 @batchSize(1) // Running in parallel make the template crash
 module contentChatModels 'modules/model.bicep' = [
-  for model in modelContentUnderstanding.chatModels: {
+  for model in models.chatModels: {
     scope: rg
     params: {
       aiFoundryAccountName: foundry.outputs.foundryResourceName
