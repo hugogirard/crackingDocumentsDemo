@@ -84,6 +84,7 @@ module foundry 'modules/foundry.bicep' = {
 // }
 
 // Content Understanding model
+@batchSize(1) // Running in parallel make the template crash
 module contentChatModels 'modules/model.bicep' = [
   for model in modelContentUnderstanding.chatModels: {
     scope: rg
