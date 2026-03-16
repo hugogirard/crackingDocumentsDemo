@@ -24,7 +24,7 @@ class ContentUnderstandingClient:
         return response.text
 
     def create_custom_model(self) -> str:
-        url = f"{self.endpoint}contentunderstanding/analyzers/{self.create_custom_model}?api-version=2025-05-01-preview"
+        url = f"{self.endpoint}contentunderstanding/analyzers/{self.custom_model_name}?api-version=2025-05-01-preview"
 
         with open('schema/invoice_model_prebuilt-documentAnalyzer_2025-05-01-preview.json', 'r') as f:
             schema = json.load(f)

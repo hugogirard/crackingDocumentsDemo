@@ -13,7 +13,7 @@ def main():
 
     logger = logging.getLogger(__name__)
 
-    #configure_document_intelligence(logger=locals)
+    configure_document_intelligence(logger=logger)
 
     configure_content_understanding(logger)
 
@@ -50,8 +50,10 @@ def configure_document_intelligence(logger:Logger):
     sas = storage_service.create_container_sas(config.storage_account_key)
         
     result = document_service.create_custom_model(model_id="custom_invoice",
-                                                  description="Custom Invoice Model",
-                                                  container_sas_url=sas)    
+                                                  description="cus-task-invoice",
+                                                  container_sas_url=sas)  
+
+
 
 if __name__ == "__main__":
     main()

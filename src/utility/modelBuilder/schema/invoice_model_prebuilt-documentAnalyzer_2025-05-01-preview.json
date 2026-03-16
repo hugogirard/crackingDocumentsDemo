@@ -1,90 +1,130 @@
 {
     "fieldSchema": {
         "fields": {
-            "Tax": {
+            "CompanyName": {
                 "type": "string",
                 "method": "extract",
-                "description": "The total tax amount charged on the invoice, typically formatted as currency (e.g., $2.00)"
+                "description": "Name of the company issuing the purchase order"
             },
-            "PurchaseOrderNumber": {
+            "CompanyPhone": {
                 "type": "string",
                 "method": "extract",
-                "description": "The unique purchase order number associated with this invoice transaction"
-            },
-            "ShippedToVendorName": {
-                "type": "string",
-                "method": "extract",
-                "description": "The name of the individual vendor or contact person at the recipient company who received the shipment"
-            },
-            "Subtotal": {
-                "type": "string",
-                "method": "extract",
-                "description": "The sum of all line items before taxes and additional charges are applied, formatted as currency (e.g., $63.00)"
-            },
-            "ShippedFromName": {
-                "type": "string",
-                "method": "extract",
-                "description": "The name of the individual who shipped or authorized the shipment from the sender's location"
+                "description": "Contact number of the company issuing the purchase order"
             },
             "Website": {
                 "type": "string",
                 "method": "extract",
-                "description": "The merchant's or sender's company website URL (e.g., www.herolimited.com)"
-            },
-            "ShippedToCompanyPhoneNumber": {
-                "type": "string",
-                "method": "extract",
-                "description": "The primary phone number of the recipient company where the items were shipped"
-            },
-            "Total": {
-                "type": "string",
-                "method": "extract",
-                "description": "The final total amount including all taxes and charges, formatted as currency (e.g., $65.00)"
-            },
-            "ShippedToCompanyName": {
-                "type": "string",
-                "method": "extract",
-                "description": "The name of the company or business that received the shipment"
-            },
-            "ShippedFromCompanyPhoneNumber": {
-                "type": "string",
-                "method": "extract",
-                "description": "The primary phone number of the sender company that shipped the items"
-            },
-            "Merchant": {
-                "type": "string",
-                "method": "extract",
-                "description": "The name of the merchant or vendor company issuing the invoice and providing the goods or services"
-            },
-            "DatedAs": {
-                "type": "string",
-                "method": "extract",
-                "description": "The official date of the invoice or transaction, typically in MM/DD/YYYY format (e.g., 04/10/2023)"
+                "description": "Website URL of the company issuing the purchase order"
             },
             "Email": {
                 "type": "string",
                 "method": "extract",
-                "description": "The primary email address of the merchant or sender company for accounts and billing inquiries"
+                "description": "Email address for accounts of the company issuing the purchase order"
             },
-            "ShippedToCompanyAddress": {
+            "PurchaseOrderDate": {
+                "type": "date",
+                "method": "extract",
+                "description": "Date when the purchase order was created"
+            },
+            "PurchaseOrderNumber": {
                 "type": "string",
                 "method": "extract",
-                "description": "The complete mailing address of the recipient company, including street, city, state, and postal code"
+                "description": "Unique identifier for the purchase order"
             },
-            "Signature": {
+            "VendorName": {
                 "type": "string",
                 "method": "extract",
-                "description": "The signature or name of the authorized person who signed or approved the invoice or shipping document"
+                "description": "Name of the vendor receiving the shipment"
+            },
+            "ShippedToCompanyName": {
+                "type": "string",
+                "method": "extract",
+                "description": "Name of the vendor's company"
+            },
+            "ShippedToAddress": {
+                "type": "string",
+                "method": "extract",
+                "description": "Address of the vendor's company"
+            },
+            "ShippedToPhone": {
+                "type": "string",
+                "method": "extract",
+                "description": "Contact number of the vendor's company"
+            },
+            "Name": {
+                "type": "string",
+                "method": "extract",
+                "description": "Name of the person sending the shipment"
             },
             "ShippedFromCompanyName": {
                 "type": "string",
                 "method": "extract",
-                "description": "The name of the company or business that sent the shipment and issued the invoice"
+                "description": "Name of the sender's company"
             },
-            "ShippedFromCompanyAddress": {
+            "ShippedFromAddress": {
                 "type": "string",
                 "method": "extract",
-                "description": "The complete mailing address of the sender company, including street, city, state, and postal code"
+                "description": "Address of the sender's company"
+            },
+            "ShippedFromPhone": {
+                "type": "string",
+                "method": "extract",
+                "description": "Contact number of the sender's company"
+            },
+            "OrderDetails": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "Details": {
+                            "type": "string",
+                            "method": "extract",
+                            "description": "Description of the item"
+                        },
+                        "Quantity": {
+                            "type": "integer",
+                            "method": "extract",
+                            "description": "Number of units ordered for the item"
+                        },
+                        "UnitPrice": {
+                            "type": "number",
+                            "method": "extract",
+                            "description": "Price per unit of the item"
+                        },
+                        "Total": {
+                            "type": "number",
+                            "method": "extract",
+                            "description": "Total price for the ordered quantity of the item"
+                        }
+                    },
+                    "description": "Details of each item in the purchase order"
+                },
+                "description": "List of items included in the purchase order"
+            },
+            "Subtotal": {
+                "type": "number",
+                "method": "extract",
+                "description": "Subtotal amount for the purchase order before tax"
+            },
+            "Tax": {
+                "type": "number",
+                "method": "extract",
+                "description": "Tax amount applied to the purchase order"
+            },
+            "Total": {
+                "type": "number",
+                "method": "extract",
+                "description": "Total amount for the purchase order including tax"
+            },
+            "ManagerName": {
+                "type": "string",
+                "method": "extract",
+                "description": "Name of the manager responsible for the purchase order"
+            },
+            "AdditionalNotes": {
+                "type": "string",
+                "method": "extract",
+                "description": "Additional instructions or notes related to the purchase order"
             }
         },
         "definitions": {}
