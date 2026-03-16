@@ -3,6 +3,7 @@ targetScope = 'subscription'
 param mainLocation string
 param contentUnderstandingLocation string
 param resourceGroupName string
+param servicePrincipalObjectId string
 
 // **** Model for Content Understanding Custom Task and ChatAgent *****
 

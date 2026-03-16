@@ -37,26 +37,6 @@ jobs:
                   echo "resourceGroupName=$(jq -r '.resourceGroupName.value' outputs.json)" >> $GITHUB_OUTPUT
                   echo "storageTrainingResourceName=$(jq -r '.storageTrainingResourceName.value' outputs.json)" >> $GITHUB_OUTPUT
 
-            - name: Assign Cognitive Services User Role
-              id: assignRoles
-              run: |
-                  # Get the service principal object ID from the Azure credentials
-                  SP_OBJECT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientId' | xargs az ad sp show --id --query id -o tsv)
-
-                  # Assign Cognitive Services User role for Document Intelligence
-                  az role assignment create \
-                    --assignee-object-id "$SP_OBJECT_ID" \
-                    --assignee-principal-type ServicePrincipal \
-                    --role "Cognitive Services User" \
-                    --scope "/subscriptions/$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.subscriptionId')/resourceGroups/${{ steps.createResources.outputs.resourceGroupName }}/providers/Microsoft.CognitiveServices/accounts/${{ steps.createResources.outputs.documentIntelligenceResourceName }}"
-
-                  # Assign Cognitive Services User role for Content Understanding (Foundry)
-                  az role assignment create \
-                    --assignee-object-id "$SP_OBJECT_ID" \
-                    --assignee-principal-type ServicePrincipal \
-                    --role "Cognitive Services User" \
-                    --scope "/subscriptions/$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.subscriptionId')/resourceGroups/${{ steps.createResources.outputs.resourceGroupName }}/providers/Microsoft.CognitiveServices/accounts/${{ steps.createResources.outputs.contentUnderstandingResourceName }}"
-
             - name: Set Secrets
               id: setSecrets
               env:
