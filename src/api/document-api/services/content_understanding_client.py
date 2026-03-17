@@ -3,8 +3,11 @@ from fastapi import Depends
 from azure.identity.aio import DefaultAzureCredential
 from .base_document_service import BaseDocumentService
 from models import DocumentResponse, DocModel, DocumentField, BoundingRegion
+from azure.ai.contentunderstanding import ContentUnderstandingClient
 from typing import List
 from aiohttp import ClientSession
+import time
+import asyncio
 
 class ContentUnderstandingClient(BaseDocumentService):
 
@@ -17,16 +20,51 @@ class ContentUnderstandingClient(BaseDocumentService):
         self.api_version = config.content_understanding_api_version
         self.http_client = client_session
 
-    async def start_analyzing(self,url_document:str) -> DocumentResponse | None:
+    async def start_analyzing(self,url_document:str) -> str:#DocumentResponse | None:
         url = f"{self.endpoint}/contentunderstanding/analyzers/{self.analyzer_id}:analyze?api-version={self.api_version}&stringEncoding=utf16"
 
         data = {"url": url_document}
 
-        async with self.http_client.post(url=url,data=data,headers=self.headers) as resp:
-            json_result = await resp.json()
+        async with self.http_client.post(url=url,json=data,headers=self.headers) as resp:
+            resp.raise_for_status()
+            operation_location = resp.headers.get("operation-location", "")
+            #json_result = await resp.json()
+        
+        if not operation_location:
+            raise ValueError("Operation location not found in response headers.")                    
 
-        return self._create_response(json_result)
+        return await self.pull_result(operation_location=operation_location)
+
+        #return self._create_response(json_result)
         #await requests.post(url=url,headers=self.headers,json=data)
+
+    async def pull_result(self,
+                        operation_location: str,
+                        timeout_seconds: int = 120,
+                        polling_interval_seconds: int = 2) -> str:
+            
+        url = operation_location
+
+        start_time = time.time()
+        while True:
+            elapsed_time = time.time() - start_time
+            if elapsed_time > timeout_seconds:
+                raise TimeoutError(
+                    f"Operation timed out after {timeout_seconds:.2f} seconds."
+                )
+
+            async with self.http_client.get(url=url, headers=self.headers) as resp:
+                resp.raise_for_status()
+                json_result = await resp.json()  # Parse JSON first
+                status = json_result.get("status", "").lower()  # Then access status
+
+            if status == "succeeded":
+                return json_result  # Return the parsed JSON
+            elif status == "failed":
+                error_details = json_result.get("error", "Unknown error")
+                raise RuntimeError(f"Request failed: {error_details}")
+            
+            await asyncio.sleep(polling_interval_seconds)  # Use async sleep
 
     async def get_models(self) -> List[DocModel]:
         pass
