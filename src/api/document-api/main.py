@@ -36,3 +36,8 @@ for route in routes:
 @app.get('/', include_in_schema=False)
 async def root():
     return RedirectResponse(url="/docs")    
+
+
+@app.get("/healthcheck")
+def healthcheck() -> dict[str, str]:
+    return {"status": "OK"}    
