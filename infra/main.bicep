@@ -3,7 +3,6 @@ targetScope = 'subscription'
 param mainLocation string
 param contentUnderstandingLocation string
 param resourceGroupName string
-param servicePrincipalObjectId string
 
 // **** Model for Content Understanding Custom Task and ChatAgent *****
 
@@ -146,6 +145,10 @@ module serverFarm 'modules/serverFarm.bicep' = {
   params: {
     location: mainLocation
     suffix: suffix
+    storageResourceName: storageAccount.outputs.name
+    documentIntelligenceResourceName: doc.outputs.resourceName
+    foundryResourceName: foundry.outputs.foundryResourceName
+    acrResourceName: registry.outputs.name
   }
 }
 
@@ -174,16 +177,9 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = {
       ]
       corsRules: [
         {
-          allowedOrigins: ['https://documentintelligence.ai.azure.com']
+          allowedOrigins: ['*']
           allowedHeaders: ['*']
           allowedMethods: ['CONNECT', 'DELETE', 'GET', 'HEAD', 'MERGE', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
-          exposedHeaders: ['*']
-          maxAgeInSeconds: 120
-        }
-        {
-          allowedOrigins: ['http://localhost:5500']
-          allowedHeaders: ['*']
-          allowedMethods: ['OPTIONS', 'PUT']
           exposedHeaders: ['*']
           maxAgeInSeconds: 120
         }
@@ -202,3 +198,12 @@ output contentUnderstandingEndpoint string = 'https://${foundry.outputs.foundryR
 output contentUnderstandingResourceName string = foundry.outputs.foundryResourceName
 output resourceGroupName string = rg.name
 output storageTrainingResourceName string = storageAccountFoundry.outputs.name
+output storageAccountName string = storageAccount.outputs.name
+output containerRegistryName string = registry.outputs.name
+output containerRegistryLoginServer string = registry.outputs.loginServer
+output webuiName string = serverFarm.outputs.webuiName
+output webuiUrl string = 'https://${serverFarm.outputs.webuiName}.azurewebsites.net'
+output documentApiName string = serverFarm.outputs.documentApiName
+output documentApiUrl string = 'https://${serverFarm.outputs.documentApiName}.azurewebsites.net'
+output valetApiName string = serverFarm.outputs.valetApiName
+output valetApiUrl string = 'https://${serverFarm.outputs.valetApiName}.azurewebsites.net'

@@ -45,3 +45,5 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
 }
 
 output foundryResourceName string = account.name
+#disable-next-line outputs-should-not-contain-secrets
+output key string = account.listKeys().key1

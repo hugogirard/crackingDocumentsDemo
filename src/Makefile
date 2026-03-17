@@ -71,3 +71,14 @@ start-valet: ## Start valet-api
 
 start-webui: ## Start webui
 	docker-compose start webui
+
+deploy-infra: ## Deploy Azure infrastructure using Bicep
+	@echo "🚀 Deploying Azure infrastructure..."
+	@bash ../scripts/deploy.sh
+
+validate-infra: ## Validate Azure Bicep templates
+	@echo "✓ Validating Azure Bicep templates..."
+	@az deployment sub validate \
+		--location canadacentral \
+		--template-file ../infra/main.bicep \
+		--parameters ../infra/main.bicepparam

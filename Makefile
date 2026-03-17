@@ -1,0 +1,90 @@
+.PHONY: help build up down restart logs clean ps setup
+
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Available targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+setup: ## Create .env file from .env.example
+	@if [ -f src/.env ]; then \
+		echo "⚠️  src/.env already exists. Remove it first or edit manually."; \
+	else \
+		cp src/.env.example src/.env; \
+		echo "✓ Created src/.env file. Please edit it with your Azure credentials."; \
+		echo "  nano src/.env"; \
+	fi
+
+build: ## Build all Docker images
+	docker-compose -f src/docker-compose.yml build
+
+up: ## Start all services
+	docker-compose -f src/docker-compose.yml up -d
+
+down: ## Stop all services
+	docker-compose -f src/docker-compose.yml down
+
+restart: ## Restart all services
+	docker-compose -f src/docker-compose.yml restart
+
+logs: ## Tail logs from all services
+	docker-compose -f src/docker-compose.yml logs -f
+
+logs-document: ## Tail logs from document-api
+	docker-compose -f src/docker-compose.yml logs -f document-api
+
+logs-valet: ## Tail logs from valet-api
+	docker-compose -f src/docker-compose.yml logs -f valet-api
+
+logs-webui: ## Tail logs from webui
+	docker-compose -f src/docker-compose.yml logs -f webui
+
+ps: ## Show running services
+	docker-compose -f src/docker-compose.yml ps
+
+clean: ## Remove all containers, networks, and volumes
+	docker-compose -f src/docker-compose.yml down -v
+	docker system prune -f
+
+rebuild: ## Rebuild and restart all services
+	docker-compose -f src/docker-compose.yml down
+	docker-compose -f src/docker-compose.yml build --no-cache
+	docker-compose -f src/docker-compose.yml up -d
+
+dev-up: ## Start services in development mode (with logs)
+	docker-compose -f src/docker-compose.yml up
+
+stop-document: ## Stop document-api
+	docker-compose -f src/docker-compose.yml stop document-api
+
+stop-valet: ## Stop valet-api
+	docker-compose -f src/docker-compose.yml stop valet-api
+
+stop-webui: ## Stop webui
+	docker-compose -f src/docker-compose.yml stop webui
+
+start-document: ## Start document-api
+	docker-compose -f src/docker-compose.yml start document-api
+
+start-valet: ## Start valet-api
+	docker-compose -f src/docker-compose.yml start valet-api
+
+start-webui: ## Start webui
+	docker-compose -f src/docker-compose.yml start webui
+
+deploy-infra: ## Deploy Azure infrastructure using Bicep
+	@echo "🚀 Deploying Azure infrastructure..."
+	@bash ./scripts/deploy.sh
+
+deploy-containers: ## Build and deploy all containers to Azure
+	@echo "🐳 Building and deploying containers..."
+	@bash ./scripts/deploy-containers.sh
+
+deploy-all: deploy-infra deploy-containers ## Deploy infrastructure and containers
+
+validate-infra: ## Validate Azure Bicep templates
+	@echo "✓ Validating Azure Bicep templates..."
+	@az deployment sub validate \
+		--location canadacentral \
+		--template-file ./infra/main.bicep \
+		--parameters ./infra/main.bicepparam
