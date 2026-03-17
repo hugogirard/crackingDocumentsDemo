@@ -31,6 +31,16 @@ class DocumentPreviewController {
         this.zoomOutBtn.addEventListener('click', () => this._zoomOut());
         this.zoomResetBtn.addEventListener('click', () => this._zoomReset());
         this.openInWindowBtn.addEventListener('click', () => this._openInNewWindow());
+        
+        // Add click handler to collapsed label to reopen panel
+        const collapsedLabel = this.panel.querySelector('.collapsed-label-right');
+        if (collapsedLabel) {
+            collapsedLabel.addEventListener('click', () => {
+                if (this.panel.classList.contains('collapsed')) {
+                    this._handleCollapse();
+                }
+            });
+        }
     }
 
     setDocument(file) {

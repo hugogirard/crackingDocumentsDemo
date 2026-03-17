@@ -18,13 +18,25 @@ class Application {
 
         // Get service selector
         this.serviceSelector = document.getElementById('serviceType');
+        
+        // Listen for service type changes to clear results
+        this.serviceSelector.addEventListener('change', () => this._handleServiceChange());
 
         console.log('Application initialized');
         NotificationService.show('Application ready. Upload a document to begin.', 'success');
     }
+    
+    _handleServiceChange() {
+        // Clear the JSON panel when service type changes
+        this.jsonViewer.clear();
+        console.log('Service type changed, results cleared');
+    }
 
     async _handleDocumentUpload(uploadResult, file) {
         try {
+            // Clear previous results before starting new analysis
+            this.jsonViewer.clear();
+            
             LoadingService.show('Analyzing document...');
 
             // Show preview

@@ -47,14 +47,23 @@
         <!-- SIDEBAR-COMPONENT: Extract to json-viewer.component -->
         <aside class="sidebar sidebar-left" id="jsonPanel">
             <div class="panel-header">
-                <fluent-text size="400" weight="semibold">JSON Response</fluent-text>
-                <fluent-button appearance="stealth" id="collapseJsonBtn" aria-label="Toggle JSON panel"
-                    class="collapse-btn">
-                    <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M10.5 12L6.5 8L10.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round" fill="none" />
-                    </svg>
-                </fluent-button>
+                <fluent-text size="400" weight="semibold">Document Analysis</fluent-text>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <fluent-button appearance="stealth" id="viewToggleBtn" aria-label="Toggle view"
+                        style="display: none;">
+                        <svg slot="start" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M2 3H14V5H2V3ZM2 7H10V9H2V7ZM2 11H14V13H2V11Z" fill="currentColor" />
+                        </svg>
+                        Structured View
+                    </fluent-button>
+                    <fluent-button appearance="stealth" id="collapseJsonBtn" aria-label="Toggle panel"
+                        class="collapse-btn">
+                        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 12L6.5 8L10.5 4" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        </svg>
+                    </fluent-button>
+                </div>
             </div>
             <div class="collapsed-label">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -79,11 +88,12 @@
                                 stroke-linejoin="round" />
                         </svg>
                         <fluent-text size="400" weight="semibold" class="empty-title">No Analysis Yet</fluent-text>
-                        <fluent-text size="300" class="empty-description">Upload and analyze a document to see the JSON
-                            response</fluent-text>
+                        <fluent-text size="300" class="empty-description">Upload and analyze a document to see the
+                            results</fluent-text>
                     </div>
                     <pre style="display: none;"><code id="jsonContent">No document analyzed yet...</code></pre>
                 </div>
+                <div class="structured-view" id="structuredView" style="display: none;"></div>
                 <fluent-button appearance="accent" id="copyJsonBtn" class="copy-btn">
                     <svg slot="start" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <path
