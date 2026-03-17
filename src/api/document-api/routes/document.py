@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from dependencies import get_document_service, get_http_client
+from dependencies import get_document_service
 from models import DocumentResponse, DocModel
 from infrastructure import ProcessorType
 from config import Config

@@ -8,17 +8,18 @@ import aiohttp
 @asynccontextmanager
 async def lifespan_event(app: FastAPI):
     
-    app.state.http_client = aiohttp.ClientSession()
+    http_client = aiohttp.ClientSession()
 
     config = Config()
 
     app.state.document_intelligence_service = DocumentService(config)
 
-    app.state.content_understanding_service = ContentUnderstandingClient(config)
+    app.state.content_understanding_service = ContentUnderstandingClient(client_session=http_client,
+                                                                         config=config)
 
     yield
 
-    app.state.http_client.close()
+    http_client.close()
 
 class Bootstrapper:
 

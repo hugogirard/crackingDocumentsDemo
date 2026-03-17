@@ -4,8 +4,8 @@ from infrastructure import ProcessorType
 from aiohttp import ClientSession
 
 
-def get_http_client(request:Request) -> ClientSession:
-    return request.app.state.http_client
+# def get_http_client(request:Request) -> ClientSession:
+#     return request.app.state.http_client
 
 def get_document_service(request:Request,
                          processor_type:ProcessorType = Query(...,description="The processor model to use to process the document")) -> BaseDocumentService:

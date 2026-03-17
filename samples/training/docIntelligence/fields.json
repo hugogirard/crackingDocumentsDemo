@@ -85,7 +85,41 @@
 			"fieldKey": "ShippedFromCompanyPhoneNumber",
 			"fieldType": "string",
 			"fieldFormat": "not-specified"
+		},
+		{
+			"fieldKey": "OrderDetails",
+			"fieldFormat": "not-specified",
+			"fieldType": "array",
+			"itemType": "OrderDetails_object"
 		}
 	],
-	"definitions": {}
+	"definitions": {
+		"OrderDetails_object": {
+			"fieldKey": "OrderDetails_object",
+			"fieldType": "object",
+			"fieldFormat": "not-specified",
+			"fields": [
+				{
+					"fieldKey": "Details",
+					"fieldType": "string",
+					"fieldFormat": "not-specified"
+				},
+				{
+					"fieldKey": "Quantity",
+					"fieldType": "string",
+					"fieldFormat": "not-specified"
+				},
+				{
+					"fieldKey": "Unit Price",
+					"fieldType": "string",
+					"fieldFormat": "not-specified"
+				},
+				{
+					"fieldKey": "Total",
+					"fieldType": "string",
+					"fieldFormat": "not-specified"
+				}
+			]
+		}
+	}
 }

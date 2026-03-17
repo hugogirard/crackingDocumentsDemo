@@ -2,8 +2,15 @@ from config import Config
 from azure.ai.documentintelligence.aio import DocumentIntelligenceClient, DocumentIntelligenceAdministrationClient
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest, DocumentModelDetails
 from azure.core.credentials import AzureKeyCredential
-from models import DocumentResponse, DocModel, DocumentField, BoundingRegion
-from typing import List, Any
+from models import (
+    DocumentResponse, 
+    DocModel, 
+    DocumentField, 
+    BoundingRegion,
+    OrderDetailsField,
+    OrderDetailItem
+)
+from typing import List, Any, Optional
 from .base_document_service import BaseDocumentService
 
 class DocumentService(BaseDocumentService):
@@ -32,13 +39,21 @@ class DocumentService(BaseDocumentService):
             
             # Convert fields to DocumentField objects
             converted_fields = {}
+            order_details_field = None
+            
             if doc.fields:
                 for k, v in doc.fields.items():
-                    converted_fields[k] = self._convert_field(v)
+                    if k == 'OrderDetails':
+                        # Handle OrderDetails separately
+                        order_details_field = self._convert_order_details(v)
+                    else:
+                        # Handle simple fields
+                        converted_fields[k] = self._convert_field(v)
 
             return DocumentResponse(
                 doc_type=doc.doc_type,
                 fields=converted_fields,
+                order_details=order_details_field,
                 confidence=doc.confidence
             )
         
@@ -68,4 +83,33 @@ class DocumentService(BaseDocumentService):
                 for r in bounding_regions
             ]
         
-        return DocumentField(**field_data)    
+        return DocumentField(**field_data) 
+
+    def _convert_order_details(self, field: Any) -> OrderDetailsField:
+        """Convert OrderDetails array field to OrderDetailsField."""
+        items = []
+        
+        if hasattr(field, 'value_array') and field.value_array:
+            for item in field.value_array:
+                if hasattr(item, 'value_object') and item.value_object:
+                    obj = item.value_object
+                    items.append(OrderDetailItem(
+                        details=self._get_field_value(obj, 'Details'),
+                        quantity=self._get_field_value(obj, 'Quantity'),
+                        unit_price=self._get_field_value(obj, 'Unit Price'),
+                        total=self._get_field_value(obj, 'Total')
+                    ))
+        
+        return OrderDetailsField(items=items)
+
+    def _get_field_value(self, obj: Any, key: str) -> Optional[str]:
+        """Extract value_string from a nested field object."""
+        if hasattr(obj, 'get'):
+            field = obj.get(key)
+            if field and hasattr(field, 'value_string'):
+                return field.value_string
+        elif hasattr(obj, key):
+            field = getattr(obj, key)
+            if field and hasattr(field, 'value_string'):
+                return field.value_string
+        return None       
