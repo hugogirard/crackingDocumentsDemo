@@ -14,7 +14,25 @@ class Config:
         return os.getenv('DOCUMENT_INTELLIGENCE_API_KEY')
     
     @property
-    def model_id(self) -> str:
+    def content_understanding_endpoint(self) -> str:
+        return os.getenv('CONTENT_UNDERSTANDING_ENDPOINT')
+    
+    @property
+    def content_understanding_api_version(self) -> str:
+        return os.getenv('CONTENT_UNDERSTANDING_API_VERSION')
+    
+    @property
+    def content_understanding_api_key(self) -> str:
+        return os.getenv('CONTENT_UNDERSTANDING_API_KEY')
+    
+    @property
+    def content_understanding_custom_model_id(self) -> str:
+        ## Hardcoded can be changed
+        return 'CUSTOM_INVOICE_MODEL'
+
+    @property
+    def doc_intelligence_model_id(self) -> str:
+        ## Hardcoded can be changed
         return 'custom_invoice'
     
     @property

@@ -1,5 +1,5 @@
 from enum import Enum
 
 class ProcessorType(Enum):
-    DOC_INTELLIGENCE = "Document Intelligence"
-    CONTENT_UNDERSTANDING = "Content Understanding"
+    DOC_INTELLIGENCE = "doc"
+    CONTENT_UNDERSTANDING = "content"
