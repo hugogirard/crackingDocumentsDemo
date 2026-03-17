@@ -1,6 +1,8 @@
 # ☁️ Azure Deployment Guide
 
-This guide walks you through deploying the entire application to Azure using the included infrastructure-as-code (Bicep) templates and deployment scripts.
+This guide provides detailed information about deploying to Azure, including configuration options, troubleshooting, and monitoring.
+
+> 📖 **Looking for step-by-step deployment instructions?** See [Deployment Workflow](DEPLOYMENT_WORKFLOW.md) for the complete deployment sequence.
 
 ## Platform Requirements
 
@@ -51,30 +53,34 @@ az account list --output table
 az account set --subscription "Your Subscription Name or ID"
 ```
 
-## Quick Start: Deploy Everything
+## Deployment Overview
 
-Deploy the complete solution (infrastructure + containers) with one command:
+> 📖 **Recommended:** Follow the [Complete Deployment Workflow](DEPLOYMENT_WORKFLOW.md) for step-by-step instructions.
+
+### Deployment Sequence
+
+The proper deployment order is:
+
+1. **`make deploy-infra`** - Deploy Azure infrastructure (~5-10 min)
+2. **`make build-models`** - Build custom models (optional, ~3-10 min)
+3. **`make deploy-containers`** - Deploy application containers (~5-15 min)
+
+### Quick Deploy
+
+For infrastructure + containers only (skips custom model building):
 
 ```bash
 make deploy-all
 ```
 
-This command will:
-1. ✅ Deploy all Azure infrastructure (~ 5-10 minutes)
-2. ✅ Build Docker images for all services
-3. ✅ Push images to Azure Container Registry
-4. ✅ Deploy containers to Azure App Services
-5. ✅ Configure environment variables
-6. ✅ Start the services
+This runs steps 1 and 3. Custom model building (`build-models`) should be run separately when needed.
 
 **After deployment completes, you'll receive:**
 - Web UI URL: `https://your-app-webui.azurewebsites.net`
 - Document API URL: `https://your-app-document-api.azurewebsites.net`
 - Valet API URL: `https://your-app-valet-api.azurewebsites.net`
 
-## Step-by-Step Deployment
-
-For more control, deploy in separate stages:
+## Detailed Deployment Steps
 
 ### Step 1: Validate Infrastructure (Optional)
 
@@ -131,7 +137,55 @@ Do you want to proceed with the deployment? (y/n) y
 Deploying Bicep template...
 ```
 
-### Step 3: Build and Deploy Containers
+**After deployment:**
+- Infrastructure is ready
+- Resources are provisioned
+- Ready for custom model training
+
+### Step 3: Build Custom Models (Optional)
+
+Train custom Document Intelligence models using your training data:
+
+```bash
+make build-models
+```
+
+**What this does:**
+1. Automatically retrieves configuration from Azure deployment
+2. Creates `src/utility/modelBuilder/.env` with proper environment variables
+3. Sets up Python virtual environment (using `uv`)
+4. Installs dependencies
+5. Uploads training data to Azure Storage
+6. Builds custom Document Intelligence model
+7. Configures Content Understanding defaults
+
+**Time:** Approximately 3-10 minutes (depending on training data size)
+
+**Expected output:**
+```
+╔════════════════════════════════════════════════════════════╗
+║      Model Builder Environment Setup                      ║
+╚════════════════════════════════════════════════════════════╝
+
+✓ Found Azure deployment: doc-intelligence-deployment-20260317-123045
+✓ Successfully created src/utility/modelBuilder/.env
+
+Creating virtual environment...
+Installing dependencies...
+Uploading training data...
+Building custom model...
+Model ID: custom-invoice-model-abc123
+✓ Model training complete
+```
+
+**When to skip:**
+- Using prebuilt Document Intelligence models only
+- No custom training data available
+- Testing/demo purposes
+
+**Training data location:** `samples/training/docIntelligence/`
+
+### Step 4: Build and Deploy Containers
 
 Build Docker images and deploy to Azure:
 

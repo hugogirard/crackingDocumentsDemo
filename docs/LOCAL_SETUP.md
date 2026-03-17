@@ -192,6 +192,60 @@ Once all services are running, access them at:
    - See the analysis results in the JSON viewer panel
    - View the original document in the preview panel
 
+## Building Custom Models (Optional)
+
+The project includes a utility for building custom Document Intelligence and Content Understanding models from training data. This is useful if you want to create specialized models for specific document types (e.g., custom invoices, forms).
+
+### Training Data
+
+Training samples are located in `samples/training/docIntelligence/`:
+- `Form_1.jpg` through `Form_5.jpg` - Sample document images
+- `.labels.json` files - Label annotations for each form
+- `.ocr.json` files - OCR results for each form
+- `fields.json` - Field definitions for the custom model
+
+### Build Custom Models
+
+Run the model builder utility:
+
+```bash
+make build-models
+```
+
+This will:
+1. Create a virtual environment (if not exists)
+2. Install required Python dependencies (`uv` package manager)
+3. Upload training data to Azure Storage
+4. Create a custom Document Intelligence model
+5. Configure Content Understanding defaults
+
+**Requirements:**
+- Azure Document Intelligence resource (S0 SKU recommended)
+- Azure Storage Account with blob container
+- Training data with proper labels and OCR annotations
+- Environment variables configured in `src/.env`
+
+**Environment Variables Needed:**
+```bash
+DOCUMENT_INTELLIGENCE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
+DOCUMENT_INTELLIGENCE_API_KEY=your-key
+STORAGE_CONNECTION_STRING=your-connection-string
+STORAGE_ACCOUNT_KEY=your-account-key
+DOC_INTELLIGENCE_TRAINING_CONTAINER=training-data
+CONTENT_UNDERSTANDING_ENDPOINT=https://your-endpoint
+MODEL_DEPLOYMENTS={"deployments":[{"modelId":"model-1"}]}
+```
+
+### Model Builder Output
+
+The utility will:
+- Create a blob container for training data
+- Upload labeled training samples
+- Build a custom model (returns model ID)
+- Display model details and capabilities
+
+**Note:** Model training can take several minutes depending on the number of samples and model complexity.
+
 ## Development Commands
 
 ### View Logs

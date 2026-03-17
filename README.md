@@ -62,18 +62,27 @@ make up
 
 ### Deploy to Azure
 
-**One-command deployment:**
+**Complete deployment workflow:**
+
+```bash
+# Step 1: Deploy Azure infrastructure
+make deploy-infra
+
+# Step 2: Build custom models (optional, requires training data)
+make build-models
+
+# Step 3: Deploy application containers
+make deploy-containers
+```
+
+**Quick deploy (infrastructure + containers):**
 ```bash
 make deploy-all
 ```
 
-This deploys:
-- ✅ Azure infrastructure (App Services, Container Registry, AI Services, Storage)
-- ✅ Docker containers for all services
-- ✅ Environment configuration
-- ✅ RBAC and managed identities
+📖 **[Complete Deployment Workflow](docs/DEPLOYMENT_WORKFLOW.md)** - Step-by-step guide
 
-📖 **[Complete Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)**
+📖 **[Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)** - Detailed configuration
 
 ## 📋 What You'll Need
 
@@ -102,6 +111,7 @@ This deploys:
 ## 🛠️ Common Commands
 
 ```bash
+# Local development
 make up              # Start all services
 make down            # Stop all services
 make logs            # View logs
@@ -109,16 +119,22 @@ make restart         # Restart services
 make rebuild         # Rebuild after code changes
 make clean           # Remove all containers and volumes
 
-# Azure deployment
-make deploy-all      # Deploy everything to Azure
-make deploy-infra    # Deploy infrastructure only
-make deploy-containers # Deploy containers only
+# Custom models
+make setup-model-builder  # Setup model builder environment from Azure
+make build-models         # Build custom Document Intelligence models
+
+# Azure deployment (run in order)
+make deploy-infra         # 1. Deploy Azure infrastructure
+make build-models         # 2. Train custom models (optional)
+make deploy-containers    # 3. Deploy application containers
+make deploy-all           # Quick: Steps 1 + 3 (skips model building)
 ```
 
 ## 📚 Documentation
 
 | Document | Description |
 |----------|-------------|
+| **[Deployment Workflow](docs/DEPLOYMENT_WORKFLOW.md)** | ⭐ Step-by-step deployment guide (START HERE) |
 | **[Local Setup Guide](docs/LOCAL_SETUP.md)** | Detailed local development setup, troubleshooting, and commands |
 | **[Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)** | Complete Azure deployment walkthrough, configuration, and monitoring |
 | **[Architecture](docs/ARCHITECTURE.md)** | System design, components, patterns, and technology stack |
@@ -161,6 +177,3 @@ Contributions are welcome! This is a demonstration project showcasing Azure AI c
 
 See [LICENSE](LICENSE) file for details.
 
----
-
-**Built with ❤️ to demonstrate Azure Document Intelligence and Content Understanding capabilities**

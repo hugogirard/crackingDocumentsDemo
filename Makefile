@@ -1,4 +1,4 @@
-.PHONY: help build up down restart logs clean ps setup
+.PHONY: help build up down restart logs clean ps setup setup-model-builder build-models deploy-infra deploy-containers deploy-all validate-infra
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -88,3 +88,18 @@ validate-infra: ## Validate Azure Bicep templates
 		--location canadacentral \
 		--template-file ./infra/main.bicep \
 		--parameters ./infra/main.bicepparam
+
+setup-model-builder: ## Setup model builder environment from Azure deployment or local config
+	@bash ./scripts/setup-model-builder.sh
+
+build-models: ## Build custom Document Intelligence and Content Understanding models
+	@echo "🔧 Building custom models..."
+	@bash ./scripts/setup-model-builder.sh
+	@cd src/utility/modelBuilder && \
+		if [ ! -d .venv ]; then \
+			echo "Creating virtual environment..."; \
+			uv venv; \
+		fi && \
+		. .venv/bin/activate && \
+		uv pip install -e . && \
+		python main.py
