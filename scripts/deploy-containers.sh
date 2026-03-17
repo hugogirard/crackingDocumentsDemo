@@ -54,9 +54,10 @@ RESOURCE_GROUP=$(echo "$OUTPUTS" | jq -r '.resourceGroupName.value')
 ACR_NAME=$(echo "$OUTPUTS" | jq -r '.containerRegistryName.value')
 ACR_LOGIN_SERVER=$(echo "$OUTPUTS" | jq -r '.containerRegistryLoginServer.value')
 WEBUI_NAME=$(echo "$OUTPUTS" | jq -r '.webuiName.value')
+WEBUI_URL=$(echo "$OUTPUTS" | jq -r '.webuiUrl.value')
 DOCUMENT_API_NAME=$(echo "$OUTPUTS" | jq -r '.documentApiName.value')
-VALET_API_NAME=$(echo "$OUTPUTS" | jq -r '.valetApiName.value')
 DOCUMENT_API_URL=$(echo "$OUTPUTS" | jq -r '.documentApiUrl.value')
+VALET_API_NAME=$(echo "$OUTPUTS" | jq -r '.valetApiName.value')
 VALET_API_URL=$(echo "$OUTPUTS" | jq -r '.valetApiUrl.value')
 
 echo -e "${GREEN}✓ Found deployment: $DEPLOYMENT_NAME${NC}"
@@ -65,6 +66,10 @@ echo -e "  Container Registry: $ACR_NAME"
 echo -e "  Web UI: $WEBUI_NAME"
 echo -e "  Document API: $DOCUMENT_API_NAME"
 echo -e "  Valet API: $VALET_API_NAME"
+echo ""
+echo -e "${BLUE}Frontend will be configured with:${NC}"
+echo -e "  VALET_API_URL: ${VALET_API_URL}/api"
+echo -e "  DOCUMENT_API_URL: ${DOCUMENT_API_URL}"
 echo ""
 
 # Login to ACR
@@ -124,8 +129,8 @@ echo -e "${YELLOW}[1/3] Configuring document-api...${NC}"
 az webapp config container set \
     --name "$DOCUMENT_API_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-    --docker-custom-image-name "${ACR_LOGIN_SERVER}/document-api:${IMAGE_TAG}" \
-    --docker-registry-server-url "https://${ACR_LOGIN_SERVER}" \
+    --container-image-name "${ACR_LOGIN_SERVER}/document-api:${IMAGE_TAG}" \
+    --container-registry-url "https://${ACR_LOGIN_SERVER}" \
     --output none
 
 echo -e "${GREEN}✓ Configured document-api${NC}"
@@ -136,8 +141,8 @@ echo -e "${YELLOW}[2/3] Configuring valet-api...${NC}"
 az webapp config container set \
     --name "$VALET_API_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-    --docker-custom-image-name "${ACR_LOGIN_SERVER}/valet-api:${IMAGE_TAG}" \
-    --docker-registry-server-url "https://${ACR_LOGIN_SERVER}" \
+    --container-image-name "${ACR_LOGIN_SERVER}/valet-api:${IMAGE_TAG}" \
+    --container-registry-url "https://${ACR_LOGIN_SERVER}" \
     --output none
 
 echo -e "${GREEN}✓ Configured valet-api${NC}"
@@ -148,8 +153,8 @@ echo -e "${YELLOW}[3/3] Configuring webui...${NC}"
 az webapp config container set \
     --name "$WEBUI_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-    --docker-custom-image-name "${ACR_LOGIN_SERVER}/webui:${IMAGE_TAG}" \
-    --docker-registry-server-url "https://${ACR_LOGIN_SERVER}" \
+    --container-image-name "${ACR_LOGIN_SERVER}/webui:${IMAGE_TAG}" \
+    --container-registry-url "https://${ACR_LOGIN_SERVER}" \
     --output none
 
 az webapp config appsettings set \
@@ -180,9 +185,9 @@ echo -e "${GREEN}✓ Deployment completed successfully!${NC}"
 echo -e "${BLUE}════════════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "Your application URLs:"
-echo -e "  ${BLUE}Web UI:${NC}         https://${WEBUI_NAME}.azurewebsites.net"
-echo -e "  ${BLUE}Document API:${NC}   https://${DOCUMENT_API_NAME}.azurewebsites.net"
-echo -e "  ${BLUE}Valet API:${NC}      https://${VALET_API_NAME}.azurewebsites.net"
+echo -e "  ${BLUE}Web UI:${NC}         $WEBUI_URL"
+echo -e "  ${BLUE}Document API:${NC}   $DOCUMENT_API_URL"
+echo -e "  ${BLUE}Valet API:${NC}      $VALET_API_URL"
 echo ""
 echo -e "${YELLOW}Note: It may take a few minutes for the containers to start.${NC}"
 echo -e "${YELLOW}You can monitor the logs with:${NC}"

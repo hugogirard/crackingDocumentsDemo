@@ -91,6 +91,10 @@ resource documentApi 'Microsoft.Web/sites@2024-11-01' = {
           value: '8000'
         }
       ]
+      cors: {
+        allowedOrigins: ['*']
+        supportCredentials: false
+      }
       linuxFxVersion: 'sitecontainers'
       acrUseManagedIdentityCreds: true
       alwaysOn: true
@@ -125,6 +129,10 @@ resource valetApi 'Microsoft.Web/sites@2024-11-01' = {
           value: '8000'
         }
       ]
+      cors: {
+        allowedOrigins: ['*']
+        supportCredentials: false
+      }
       linuxFxVersion: 'sitecontainers'
       acrUseManagedIdentityCreds: true
       alwaysOn: true
@@ -171,7 +179,10 @@ module webArcPullValetAPI 'br/public:avm/ptn/authorization/resource-role-assignm
 
 output webuiName string = webui.name
 output webuiPrincipalId string = webui.identity.principalId
+output webuiDefaultHostName string = webui.properties.defaultHostName
 output documentApiName string = documentApi.name
 output documentApiPrincipalId string = documentApi.identity.principalId
+output documentApiDefaultHostName string = documentApi.properties.defaultHostName
 output valetApiName string = valetApi.name
 output valetApiPrincipalId string = valetApi.identity.principalId
+output valetApiDefaultHostName string = valetApi.properties.defaultHostName
