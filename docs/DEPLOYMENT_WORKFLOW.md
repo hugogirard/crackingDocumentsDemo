@@ -1,8 +1,38 @@
 # 🚀 Complete Deployment Workflow
 
-This guide provides the step-by-step workflow for deploying the Document Intelligence application to Azure, from infrastructure provisioning to custom model training.
+This guide provides the step-by-step workflow for deploying the Document Intelligence application.
 
-## 📋 Overview
+## 🎯 Deployment Paths
+
+Choose your deployment path:
+
+### Path 1: Cloud Deployment (Azure) ☁️
+
+Deploy everything to Azure - infrastructure, models, and containers:
+
+1. **Deploy Azure Infrastructure** → `make deploy-infra`
+2. **Build Custom Models** (optional) → `make build-models`
+3. **Deploy Containers** → `make deploy-containers`
+
+📖 Continue reading this guide for detailed Azure deployment steps.
+
+---
+
+### Path 2: Local Development 💻
+
+Run the application locally with Docker (requires existing Azure resources):
+
+1. **Create Azure resources** manually in Azure Portal (Document Intelligence, Storage, Content Understanding)
+2. **Setup local environment** → `make setup` + `make setup-local`
+3. **Start services** → `make up`
+
+📖 See [Local Setup Guide](LOCAL_SETUP.md) for detailed local development steps.
+
+**Note:** Local development requires Azure resources to already exist. The application connects to cloud services for document processing and storage.
+
+---
+
+## 📋 Overview (Cloud Deployment)
 
 The complete deployment involves these steps in order:
 

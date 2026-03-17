@@ -2,6 +2,28 @@
 
 This guide walks you through setting up and running the application locally using Docker Compose.
 
+## Quick Start
+
+**Prerequisites:** Azure resources must already exist (Document Intelligence, Storage, Content Understanding)
+
+```bash
+# 1. Clone and create environment file
+git clone <repository-url>
+cd crackingDocumentsDemo
+make setup
+
+# 2. Edit src/.env with your Azure credentials
+nano src/.env
+
+# 3. Copy environment to API services
+make setup-local
+
+# 4. Start all services
+make up
+
+# 5. Access at http://localhost:8080
+```
+
 ## Prerequisites
 
 ### Required Software
@@ -111,10 +133,20 @@ STORAGE_ACCOUNT_KEY=your-actual-storage-account-key
    - Go to Azure Portal → Your Storage Account → Access Keys
    - Copy "Key 1" and "Connection string"
 
-### Step 4: Create Environment Files for APIs
+### Step 4: Copy Environment to API Services
 
-The Docker Compose setup requires individual `.env` files for each API:
+The Docker Compose setup requires individual `.env` files for each API. Use the convenience command:
 
+```bash
+# From the project root
+make setup-local
+```
+
+This copies `src/.env` to:
+- `src/api/document-api/.env`
+- `src/api/valet-api/.env`
+
+**Or copy manually:**
 ```bash
 # From the src/ directory
 cp .env api/document-api/.env

@@ -38,27 +38,36 @@ Web UI (Port 8080) → Document API (Port 8800) → Azure Document Intelligence
 
 ### Local Development
 
-**1. Clone and setup:**
+> ⚠️ **Prerequisites**: You must have Azure resources already provisioned (Document Intelligence, Storage Account, Content Understanding). See [Local Setup Guide](docs/LOCAL_SETUP.md) for details on creating Azure resources.
+
+**1. Clone the repository:**
 ```bash
 git clone <repository-url>
 cd crackingDocumentsDemo
-make setup
 ```
 
-**2. Configure Azure credentials:**
-Edit `src/.env` with your Azure service endpoints and keys (Document Intelligence, Content Understanding, Storage).
+**2. Create and configure environment file:**
+```bash
+make setup
+nano src/.env  # Edit with your Azure credentials
+```
 
-**3. Start services:**
+**3. Copy environment to API services:**
+```bash
+make setup-local
+```
+
+**4. Start services:**
 ```bash
 make up
 ```
 
-**4. Access the application:**
+**5. Access the application:**
 - Web UI: http://localhost:8080
 - Document API: http://localhost:8800/docs
 - Valet API: http://localhost:8000/docs
 
-📖 **[Complete Local Setup Guide](docs/LOCAL_SETUP.md)**
+📖 **[Complete Local Setup Guide](docs/LOCAL_SETUP.md)** - Includes Azure resource setup
 
 ### Deploy to Azure
 
@@ -87,18 +96,19 @@ make deploy-all
 ## 📋 What You'll Need
 
 ### For Local Development
-- Docker 20.10+
-- Docker Compose 2.0+
-- Azure subscriptions services:
-  - Document Intelligence (F0 or S0 SKU)
-  - Content Understanding (S0 SKU)  
+- **Docker** 20.10+ and **Docker Compose** 2.0+
+- **Azure resources** (must be created manually in Azure Portal or via `make deploy-infra`):
+  - Document Intelligence service (F0 or S0 SKU)
+  - Content Understanding service (S0 SKU)  
   - Storage Account (Standard LRS)
 
+> ⚠️ **Important**: Local development requires Azure cloud services. The application containers run locally but connect to Azure for document processing and storage.
+
 ### Additional for Azure Deployment (Linux/macOS/WSL only)
-- Azure CLI 2.50+
-- jq 1.6+
-- make
-- bash 4.0+
+- **Azure CLI** 2.50+
+- **jq** 1.6+ (JSON processor)
+- **make** and **bash** 4.0+
+- **Docker** 20.10+ (for building images)
 
 ## 🎮 Usage
 
@@ -111,13 +121,15 @@ make deploy-all
 ## 🛠️ Common Commands
 
 ```bash
-# Local development
-make up              # Start all services
-make down            # Stop all services
-make logs            # View logs
-make restart         # Restart services
-make rebuild         # Rebuild after code changes
-make clean           # Remove all containers and volumes
+# Local development setup
+make setup            # Create src/.env from template
+make setup-local      # Copy .env to API directories (document-api, valet-api)
+make up               # Start all services
+make down             # Stop all services
+make logs             # View logs
+make restart          # Restart services
+make rebuild          # Rebuild after code changes
+make clean            # Remove all containers and volumes
 
 # Custom models
 make setup-model-builder  # Setup model builder environment from Azure

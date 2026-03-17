@@ -1,4 +1,4 @@
-.PHONY: help build up down restart logs clean ps setup setup-model-builder build-models deploy-infra deploy-containers deploy-all validate-infra
+.PHONY: help build up down restart logs clean ps setup setup-local setup-model-builder build-models deploy-infra deploy-containers deploy-all validate-infra
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -14,6 +14,24 @@ setup: ## Create .env file from .env.example
 		echo "✓ Created src/.env file. Please edit it with your Azure credentials."; \
 		echo "  nano src/.env"; \
 	fi
+
+setup-local: ## Copy .env to API directories for local development
+	@if [ ! -f src/.env ]; then \
+		echo "❌ Error: src/.env not found. Run 'make setup' first and configure it."; \
+		exit 1; \
+	fi
+	@echo "📋 Copying environment configuration to API services..."
+	@cp src/.env src/api/document-api/.env
+	@echo "✓ Copied to src/api/document-api/.env"
+	@cp src/.env src/api/valet-api/.env
+	@echo "✓ Copied to src/api/valet-api/.env"
+	@echo ""
+	@echo "✅ Local environment setup complete!"
+	@echo ""
+	@echo "⚠️  Note: Azure resources (Document Intelligence, Storage, Content Understanding)"
+	@echo "   must already be provisioned. If not, create them manually in Azure Portal."
+	@echo ""
+	@echo "Next step: make up"
 
 build: ## Build all Docker images
 	docker-compose -f src/docker-compose.yml build
