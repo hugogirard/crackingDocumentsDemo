@@ -4,24 +4,40 @@ This guide walks you through setting up and running the application locally usin
 
 ## Quick Start
 
-**Prerequisites:** Azure resources must already exist (Document Intelligence, Storage, Content Understanding)
+**Recommended: Auto-configure from Azure**
 
 ```bash
-# 1. Clone and create environment file
+# 1. Clone and deploy Azure infrastructure
 git clone <repository-url>
 cd crackingDocumentsDemo
+make deploy-infra
+
+# 2. Auto-setup environment (automatically pulls Azure credentials!)
 make setup
 
-# 2. Edit src/.env with your Azure credentials
-nano src/.env
-
-# 3. Copy environment to API services
+# 3. Copy to API services
 make setup-local
 
-# 4. Start all services
+# 4. Start services locally
 make up
 
 # 5. Access at http://localhost:8080
+```
+
+**Alternative: Manual configuration with existing resources**
+
+```bash
+# 1. Clone and setup
+git clone <repository-url>
+cd crackingDocumentsDemo
+make setup  # Creates template
+
+# 2. Manually edit with your Azure credentials
+nano src/.env
+
+# 3. Copy and start
+make setup-local
+make up
 ```
 
 ## Prerequisites
@@ -83,22 +99,65 @@ git clone <repository-url>
 cd crackingDocumentsDemo
 ```
 
-### Step 2: Set Up Environment Variables
+### Step 2: Setup Environment (Smart Configuration)
 
-Navigate to the `src` directory and create environment configuration files:
+The `make setup` command intelligently configures your environment:
 
-```bash
-cd src
-cp .env.example .env
-```
-
-Or use the Makefile shortcut from the project root:
-
+**If Azure deployment exists:**
 ```bash
 make setup
 ```
 
-### Step 3: Configure Azure Credentials
+This will:
+- ✅ Detect your Azure deployment automatically
+- ✅ Retrieve endpoints from deployment outputs
+- ✅ Fetch API keys from Azure resources
+- ✅ Pull storage credentials from Azure
+- ✅ Create `src/.env` with all credentials pre-filled
+
+**Output example:**
+```
+╔════════════════════════════════════════════════════════════╗
+║      Local Environment Setup                              ║
+╚════════════════════════════════════════════════════════════╝
+
+✓ Found Azure deployment: doc-intelligence-deployment-20260317-123045
+Extracting configuration from Azure...
+
+  ✓ Document Intelligence key retrieved
+  ✓ Content Understanding key retrieved
+  ✓ Storage Account credentials retrieved
+
+✓ Successfully created src/.env with Azure credentials!
+
+╔════════════════════════════════════════════════════════════╗
+║      Environment Setup Complete!                          ║
+╚════════════════════════════════════════════════════════════╝
+
+Configuration:
+  Resource Group: rg-doc-intelligence
+  Document Intelligence: doc-intelligence-service
+  Storage Account: storageaccount123
+
+Next steps:
+  1. Review the configuration: nano src/.env
+  2. Copy to API services: make setup-local
+  3. Start services: make up
+```
+
+**If no Azure deployment found:**
+
+The command creates a template from `.env.example`:
+```bash
+make setup
+```
+
+You'll need to manually edit `src/.env` with your Azure credentials:
+```bash
+nano src/.env
+```
+
+### Step 3: Configure Azure Credentials (Manual - Skip if auto-configured)
 
 Edit the `.env` file with your Azure service credentials:
 

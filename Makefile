@@ -6,14 +6,8 @@ help: ## Show this help message
 	@echo 'Available targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-setup: ## Create .env file from .env.example
-	@if [ -f src/.env ]; then \
-		echo "⚠️  src/.env already exists. Remove it first or edit manually."; \
-	else \
-		cp src/.env.example src/.env; \
-		echo "✓ Created src/.env file. Please edit it with your Azure credentials."; \
-		echo "  nano src/.env"; \
-	fi
+setup: ## Create .env file from .env.example or Azure deployment
+	@bash ./scripts/setup-local-env.sh
 
 setup-local: ## Copy .env to API directories for local development
 	@if [ ! -f src/.env ]; then \

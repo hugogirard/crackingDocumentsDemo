@@ -20,15 +20,23 @@ Deploy everything to Azure - infrastructure, models, and containers:
 
 ### Path 2: Local Development 💻
 
-Run the application locally with Docker (requires existing Azure resources):
+Run the application locally with Docker (requires Azure infrastructure):
 
-1. **Create Azure resources** manually in Azure Portal (Document Intelligence, Storage, Content Understanding)
-2. **Setup local environment** → `make setup` + `make setup-local`
-3. **Start services** → `make up`
+**Recommended workflow:**
+1. **Deploy Azure infrastructure** → `make deploy-infra`
+2. **Auto-setup environment** → `make setup` (automatically pulls Azure credentials!)
+3. **Copy to APIs** → `make setup-local`
+4. **Start services** → `make up`
+
+**Alternative with existing resources:**
+1. **Setup template** → `make setup` (creates template if no Azure deployment found)
+2. **Edit manually** → `nano src/.env` (add your Azure endpoints/keys)
+3. **Copy to APIs** → `make setup-local`
+4. **Start services** → `make up`
 
 📖 See [Local Setup Guide](LOCAL_SETUP.md) for detailed local development steps.
 
-**Note:** Local development requires Azure resources to already exist. The application connects to cloud services for document processing and storage.
+**Note:** `make setup` intelligently detects Azure deployments and automatically retrieves credentials!
 
 ---
 

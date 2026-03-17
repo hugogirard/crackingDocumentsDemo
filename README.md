@@ -38,36 +38,37 @@ Web UI (Port 8080) → Document API (Port 8800) → Azure Document Intelligence
 
 ### Local Development
 
-> ⚠️ **Prerequisites**: You must have Azure resources already provisioned (Document Intelligence, Storage Account, Content Understanding). See [Local Setup Guide](docs/LOCAL_SETUP.md) for details on creating Azure resources.
+**Recommended: Auto-configure from Azure deployment**
 
-**1. Clone the repository:**
 ```bash
-git clone <repository-url>
-cd crackingDocumentsDemo
-```
+# 1. Deploy Azure infrastructure (creates all resources)
+make deploy-infra
 
-**2. Create and configure environment file:**
-```bash
+# 2. Auto-setup environment (pulls credentials from Azure!)
 make setup
-nano src/.env  # Edit with your Azure credentials
-```
 
-**3. Copy environment to API services:**
-```bash
+# 3. Copy environment to API services
 make setup-local
-```
 
-**4. Start services:**
-```bash
+# 4. Run locally with Docker
 make up
 ```
 
-**5. Access the application:**
+**Alternative: Use existing Azure resources**
+
+```bash
+make setup          # Creates template from .env.example
+nano src/.env       # Manually add Azure endpoints and keys
+make setup-local    # Copy to API directories
+make up             # Start services
+```
+
+**Access the application:**
 - Web UI: http://localhost:8080
 - Document API: http://localhost:8800/docs
 - Valet API: http://localhost:8000/docs
 
-📖 **[Complete Local Setup Guide](docs/LOCAL_SETUP.md)** - Includes Azure resource setup
+📖 **[Complete Local Setup Guide](docs/LOCAL_SETUP.md)**
 
 ### Deploy to Azure
 
@@ -97,12 +98,12 @@ make deploy-all
 
 ### For Local Development
 - **Docker** 20.10+ and **Docker Compose** 2.0+
-- **Azure resources** (must be created manually in Azure Portal or via `make deploy-infra`):
+- **Azure resources** (created via `make deploy-infra` or manually in Azure Portal):
   - Document Intelligence service (F0 or S0 SKU)
   - Content Understanding service (S0 SKU)  
   - Storage Account (Standard LRS)
 
-> ⚠️ **Important**: Local development requires Azure cloud services. The application containers run locally but connect to Azure for document processing and storage.
+> ⚠️ **Important**: Azure infrastructure must be deployed **before** local setup to obtain endpoints and API keys. The application containers run locally but connect to Azure services for document processing and storage.
 
 ### Additional for Azure Deployment (Linux/macOS/WSL only)
 - **Azure CLI** 2.50+
@@ -122,8 +123,8 @@ make deploy-all
 
 ```bash
 # Local development setup
-make setup            # Create src/.env from template
-make setup-local      # Copy .env to API directories (document-api, valet-api)
+make setup            # Auto-create .env (pulls from Azure if available)
+make setup-local      # Copy .env to API directories
 make up               # Start all services
 make down             # Stop all services
 make logs             # View logs
