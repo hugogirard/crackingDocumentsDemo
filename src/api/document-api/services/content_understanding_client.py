@@ -2,7 +2,7 @@ from config import Config
 from fastapi import Depends
 from azure.identity.aio import DefaultAzureCredential
 from .base_document_service import BaseDocumentService
-from models import DocumentResponse, DocModel, DocumentField, BoundingRegion
+from models import DocumentResponse, DocModel, DocumentField, BoundingRegion, OrderDetailsField, OrderDetailItem
 from azure.ai.contentunderstanding import ContentUnderstandingClient
 from typing import List
 from aiohttp import ClientSession
@@ -20,7 +20,7 @@ class ContentUnderstandingClient(BaseDocumentService):
         self.api_version = config.content_understanding_api_version
         self.http_client = client_session
 
-    async def start_analyzing(self,url_document:str) -> str:#DocumentResponse | None:
+    async def start_analyzing(self,url_document:str) -> DocumentResponse | None:
         url = f"{self.endpoint}/contentunderstanding/analyzers/{self.analyzer_id}:analyze?api-version={self.api_version}&stringEncoding=utf16"
 
         data = {"url": url_document}
@@ -28,20 +28,18 @@ class ContentUnderstandingClient(BaseDocumentService):
         async with self.http_client.post(url=url,json=data,headers=self.headers) as resp:
             resp.raise_for_status()
             operation_location = resp.headers.get("operation-location", "")
-            #json_result = await resp.json()
         
         if not operation_location:
             raise ValueError("Operation location not found in response headers.")                    
 
-        return await self.pull_result(operation_location=operation_location)
+        json_result = await self.pull_result(operation_location=operation_location)
+        return self._create_response(json_result)
 
-        #return self._create_response(json_result)
-        #await requests.post(url=url,headers=self.headers,json=data)
 
     async def pull_result(self,
                         operation_location: str,
                         timeout_seconds: int = 120,
-                        polling_interval_seconds: int = 2) -> str:
+                        polling_interval_seconds: int = 2) -> dict:
             
         url = operation_location
 
@@ -100,7 +98,14 @@ class ContentUnderstandingClient(BaseDocumentService):
         
         # Map to DocumentResponse
         document_fields = {}
+        order_details = None
+        
         for field_name, field_data in api_fields.items():
+            # Handle OrderDetails separately
+            if field_name == "OrderDetails" and "valueArray" in field_data:
+                order_details = self._parse_order_details(field_data["valueArray"])
+                continue
+            
             # Extract the value based on type
             content_value = None
             if "valueString" in field_data:
@@ -112,7 +117,7 @@ class ContentUnderstandingClient(BaseDocumentService):
             elif "valueDate" in field_data:
                 content_value = field_data["valueDate"]
             elif "valueArray" in field_data:
-                content_value = str(field_data["valueArray"])  # or handle arrays specially
+                content_value = self._parse_array_field(field_data["valueArray"])
             
             # Parse bounding regions from source string
             bounding_regions = None
@@ -128,8 +133,77 @@ class ContentUnderstandingClient(BaseDocumentService):
         return DocumentResponse(
             doc_type=content.get("kind"),  # or use analyzer_id
             fields=document_fields,
+            order_details=order_details,
             confidence=None  # overall confidence not provided in response
         )         
+
+    def _parse_order_details(self, value_array: list) -> OrderDetailsField:
+        """Parse OrderDetails array into OrderDetailsField structure"""
+        items = []
+        
+        for item in value_array:
+            if item.get("type") == "object" and "valueObject" in item:
+                value_obj = item["valueObject"]
+                
+                # Map field names from API format to model format
+                order_item = OrderDetailItem(
+                    details=self._extract_field_value(value_obj.get("Details")),
+                    quantity=self._extract_field_value(value_obj.get("Quantity")),
+                    unit_price=self._extract_field_value(value_obj.get("UnitPrice")),
+                    total=self._extract_field_value(value_obj.get("Total"))
+                )
+                items.append(order_item)
+        
+        return OrderDetailsField(items=items) if items else None
+
+    def _extract_field_value(self, field_data: dict) -> str:
+        """Extract value from field data dict"""
+        if not field_data:
+            return None
+        
+        if "valueString" in field_data:
+            return field_data["valueString"]
+        elif "valueInteger" in field_data:
+            return str(field_data["valueInteger"])
+        elif "valueNumber" in field_data:
+            return str(field_data["valueNumber"])
+        elif "valueDate" in field_data:
+            return field_data["valueDate"]
+        
+        return None
+
+    def _parse_array_field(self, value_array: list) -> list:
+        """Parse array fields, especially arrays of objects like OrderDetails"""
+        parsed_items = []
+        
+        for item in value_array:
+            if item.get("type") == "object" and "valueObject" in item:
+                # Handle arrays of objects (e.g., OrderDetails with line items)
+                obj = {}
+                for key, value in item["valueObject"].items():
+                    if "valueString" in value:
+                        obj[key] = value["valueString"]
+                    elif "valueInteger" in value:
+                        obj[key] = value["valueInteger"]
+                    elif "valueNumber" in value:
+                        obj[key] = value["valueNumber"]
+                    elif "valueDate" in value:
+                        obj[key] = value["valueDate"]
+                    else:
+                        obj[key] = value.get("content")
+                parsed_items.append(obj)
+            else:
+                # Handle simple array items (strings, numbers, etc.)
+                if "valueString" in item:
+                    parsed_items.append(item["valueString"])
+                elif "valueInteger" in item:
+                    parsed_items.append(item["valueInteger"])
+                elif "valueNumber" in item:
+                    parsed_items.append(item["valueNumber"])
+                else:
+                    parsed_items.append(item)
+        
+        return parsed_items
 
     def _parse_bounding_regions(self, source: str) -> List[BoundingRegion]:
         """Parse bounding regions from source string like 'D(1,x1,y1,x2,y2,...)'"""
