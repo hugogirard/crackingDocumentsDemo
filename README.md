@@ -11,6 +11,32 @@ A comprehensive document analysis application demonstrating **Azure Document Int
 - ☁️ **Azure-Ready** - One-command deployment to Azure with Bicep IaC
 - 📊 **Interactive APIs** - Swagger/OpenAPI documentation included
 
+## 📸 Screenshots
+
+### Application Interface
+
+<div align="center">
+
+#### Main Interface & Document Upload
+![Upload Interface](docs/images/home-interface.png)
+*Clean, intuitive interface with drag-and-drop document upload*
+
+#### Analysis Results with Split View
+![Results View](docs/images/results-view.png)
+*Side-by-side view: Original document preview and extracted JSON results*
+
+#### JSON Data Extraction
+![JSON Results](docs/images/json-results-detail.png)
+*Structured data extraction showing key-value pairs, tables, and content*
+
+#### API Documentation (Swagger UI)
+![API Documentation](docs/images/api-docs.png)
+*Interactive API documentation with FastAPI/Swagger*
+
+</div>
+
+> 📝 **Note:** Screenshots show the application running locally. See [Screenshots Guide](docs/SCREENSHOTS.md) for capturing your own.
+
 ## 🏗️ Architecture
 
 **Three-tier microservices architecture:**
@@ -132,6 +158,9 @@ make restart          # Restart services
 make rebuild          # Rebuild after code changes
 make clean            # Remove all containers and volumes
 
+# Documentation
+make capture-screenshots  # Interactive helper for capturing app screenshots
+
 # Custom models
 make setup-model-builder  # Setup model builder environment from Azure
 make build-models         # Build custom Document Intelligence models
@@ -151,6 +180,7 @@ make deploy-all           # Quick: Steps 1 + 3 (skips model building)
 | **[Local Setup Guide](docs/LOCAL_SETUP.md)** | Detailed local development setup, troubleshooting, and commands |
 | **[Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)** | Complete Azure deployment walkthrough, configuration, and monitoring |
 | **[Architecture](docs/ARCHITECTURE.md)** | System design, components, patterns, and technology stack |
+| **[Screenshots Guide](docs/SCREENSHOTS.md)** | How to capture application screenshots for documentation |
 | [API Integration Guide](src/webui/API_INTEGRATION.md) | API documentation and integration details |
 | [Fluent UI Guide](src/webui/FLUENT_UI_GUIDE.md) | UI component library reference |
 
