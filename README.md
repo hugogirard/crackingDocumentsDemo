@@ -1,322 +1,166 @@
 # 📄 Cracking Documents Demo
 
-A comprehensive document analysis application that demonstrates the powerful capabilities of **Azure Document Intelligence** and **Azure Content Understanding** services. This solution provides an intuitive web interface for uploading documents (PDF, JPEG, PNG) and extracting structured information using Azure's AI-powered document processing services.
+A comprehensive document analysis application demonstrating **Azure Document Intelligence** and **Azure Content Understanding** services. Upload documents (PDF, JPEG, PNG) through an intuitive web interface and extract structured information using Azure's AI-powered document processing.
 
-## 🎯 Project Goals
+## ✨ Features
 
-This repository serves as a complete demonstration and reference implementation for:
-
-1. **Azure Document Intelligence Integration**: Showcase optical character recognition (OCR), layout analysis, and form recognition capabilities
-2. **Azure Content Understanding**: Demonstrate advanced document understanding with custom models and content extraction
-3. **Modern Web Architecture**: Illustrate a clean separation between frontend (Web UI), backend services (APIs), and cloud services
-4. **Secure Storage Access**: Implement the Valet Key pattern for secure, time-limited access to Azure Storage
-5. **Containerized Architecture**: Microservices architecture with Docker Compose for local development
+- 🔍 **OCR & Layout Analysis** - Extract text, tables, and structure from documents
+- 🧠 **AI-Powered Understanding** - Advanced content extraction with custom models
+- 🔐 **Secure Storage** - Valet Key pattern for time-limited blob access
+- 🐳 **Containerized** - Docker Compose for easy local development
+- ☁️ **Azure-Ready** - One-command deployment to Azure with Bicep IaC
+- 📊 **Interactive APIs** - Swagger/OpenAPI documentation included
 
 ## 🏗️ Architecture
 
-The application consists of three main components:
+**Three-tier microservices architecture:**
 
 ```
-┌─────────────┐
-│   Web UI    │ ← Microsoft Fluent UI (HTML/CSS/JS)
-│  (Port 8080)│
-└──────┬──────┘
-       │
-       ├──────────────────┬────────────────────┐
-       │                  │                    │
-       ▼                  ▼                    ▼
-┌─────────────┐   ┌──────────────┐   ┌──────────────┐
-│ Document API│   │  Valet API   │   │Azure Storage │
-│ (Port 8800) │   │ (Port 8000)  │   │   (Blobs)    │
-└──────┬──────┘   └──────┬───────┘   └──────────────┘
-       │                 │
-       ▼                 ▼
-┌──────────────────────────────────────┐
-│     Azure Cognitive Services         │
-│  • Document Intelligence             │
-│  • Content Understanding             │
-└──────────────────────────────────────┘
+Web UI (Port 8080) → Document API (Port 8800) → Azure Document Intelligence
+                   ↓ Valet API (Port 8000)     → Azure Storage
+                                               → Azure Content Understanding
 ```
 
-- **Web UI**: Pure JavaScript application using Microsoft Fluent UI design principles for document upload and analysis visualization
-- **Document API**: FastAPI service that interfaces with Azure Document Intelligence and Content Understanding
-- **Valet API**: FastAPI service that generates secure SAS tokens for Azure Storage access
-- **Azure Services**: Cloud-based AI services for document processing and blob storage
+- **Web UI**: JavaScript + Fluent UI for document upload and visualization
+- **Document API**: Python FastAPI for Azure AI service integration
+- **Valet API**: Python FastAPI for secure SAS token generation
 
-> ⚠️ **Disclaimer**: The Web UI was created with Claude LLM as a demonstration and is **not recommended for production use**. It uses Fluent UI principles in vanilla JavaScript. For production applications, we recommend using modern frameworks like **Vue.js**, **React.js**, or **Angular** with proper component libraries, state management, and testing infrastructure.
+📖 **[Full Architecture Documentation](docs/ARCHITECTURE.md)**
 
-## 📋 Prerequisites
+## 🚀 Quick Start
 
-### Required Software
+### Prerequisites
 
-| Software | Version | Purpose | Installation |
-|----------|---------|---------|--------------|
-| **Docker** | 20.10+ | Container runtime | [Install Docker](https://docs.docker.com/get-docker/) |
-| **Docker Compose** | 2.0+ | Multi-container orchestration | [Install Docker Compose](https://docs.docker.com/compose/install/) |
-| **Make** (optional) | Any | Convenience commands | Usually pre-installed on Linux/macOS |
+| Platform | Local Development | Azure Deployment |
+|----------|-------------------|------------------|
+| **Linux/macOS** | ✅ Docker + Docker Compose | ✅ Azure CLI + make + jq |
+| **Windows** | ✅ Docker + Docker Compose | ⚠️ Requires [WSL](https://learn.microsoft.com/windows/wsl/install) |
 
-### Required Azure Services
+### Local Development
 
-You need to provision the following Azure services before running this application:
-
-#### 1. Azure Document Intelligence
-
-- **Service**: Azure AI Document Intelligence (formerly Form Recognizer)
-- **Required SKU**: F0 (Free) or S0 (Standard)
-- **What you need**:
-  - Endpoint URL (e.g., `https://your-resource.cognitiveservices.azure.com/`)
-  - API Key (Key 1 or Key 2)
-- **How to create**: 
-  - [Azure Portal](https://portal.azure.com/) → Create a resource → "Document Intelligence"
-  - [Documentation](https://learn.microsoft.com/azure/ai-services/document-intelligence/)
-
-#### 2. Azure Content Understanding
-
-- **Service**: Azure AI Content Understanding
-- **Required SKU**: S0 (Standard)
-- **What you need**:
-  - Endpoint URL
-  - API Key
-- **How to create**:
-  - Azure Portal → Create a resource → "Content Understanding"
-  - [Documentation](https://learn.microsoft.com/azure/ai-services/content-understanding/)
-
-#### 3. Azure Storage Account
-
-- **Service**: Azure Storage Account
-- **Required SKU**: Standard_LRS or higher
-- **What you need**:
-  - Storage Connection String
-  - Storage Account Key
-  - Container for document storage (will be created automatically if it doesn't exist)
-- **How to create**:
-  - Azure Portal → Create a resource → "Storage Account"
-  - [Documentation](https://learn.microsoft.com/azure/storage/common/storage-account-create)
-
-> **💡 Tip**: If you're new to Azure, you can sign up for a [free account](https://azure.microsoft.com/free/) which includes free credits and free tiers for many services.
-
-## 🚀 Running Locally
-
-### Step 1: Clone the Repository
-
+**1. Clone and setup:**
 ```bash
 git clone <repository-url>
 cd crackingDocumentsDemo
-```
-
-### Step 2: Set Up Environment Variables
-
-Navigate to the `src` directory and create environment configuration files:
-
-```bash
-cd src
-cp .env.example .env
-```
-
-Or use the Makefile shortcut:
-
-```bash
-cd src
 make setup
 ```
 
-### Step 3: Configure Azure Credentials
+**2. Configure Azure credentials:**
+Edit `src/.env` with your Azure service endpoints and keys (Document Intelligence, Content Understanding, Storage).
 
-Edit the `.env` file with your Azure service credentials:
-
-```bash
-nano .env  # or use your preferred editor
-```
-
-Update the following values:
-
-```bash
-# Azure Document Intelligence Configuration
-DOCUMENT_INTELLIGENCE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
-DOCUMENT_INTELLIGENCE_API_KEY=your-actual-api-key-here
-
-# Azure Content Understanding Configuration
-CONTENT_UNDERSTANDING_ENDPOINT=https://your-content-understanding.cognitiveservices.azure.com/
-CONTENT_UNDERSTANDING_API_VERSION=2024-02-01
-CONTENT_UNDERSTANDING_API_KEY=your-actual-api-key-here
-
-# Azure Storage Configuration
-STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=yourkey;EndpointSuffix=core.windows.net
-STORAGE_ACCOUNT_KEY=your-actual-storage-account-key
-```
-
-**How to find your Azure credentials:**
-
-1. **Document Intelligence & Content Understanding**:
-   - Go to Azure Portal → Your Resource → Keys and Endpoint
-   - Copy "KEY 1" and "Endpoint"
-
-2. **Storage Account**:
-   - Go to Azure Portal → Your Storage Account → Access Keys
-   - Copy "Key 1" and "Connection string"
-
-### Step 4: Create Environment Files for APIs
-
-The Docker Compose setup requires individual `.env` files for each API:
-
-```bash
-# From the src/ directory
-cp .env api/document-api/.env
-cp .env api/valet-api/.env
-```
-
-### Step 5: Build and Start Services
-
-From the `src` directory, run:
-
-```bash
-docker-compose up -d
-```
-
-Or use the Makefile:
-
+**3. Start services:**
 ```bash
 make up
 ```
 
-This will:
-- Build Docker images for all three services
-- Start all containers in detached mode
-- Create a Docker network for inter-service communication
+**4. Access the application:**
+- Web UI: http://localhost:8080
+- Document API: http://localhost:8800/docs
+- Valet API: http://localhost:8000/docs
 
-**Expected output:**
-```
-[+] Building ...
-[+] Running 4/4
- ✔ Network src_app-network           Created
- ✔ Container document-api            Started
- ✔ Container valet-api               Started
- ✔ Container document-demo-webui     Started
-```
+📖 **[Complete Local Setup Guide](docs/LOCAL_SETUP.md)**
 
-### Step 6: Verify Services are Running
+### Deploy to Azure
 
-Check the status of all services:
-
+**One-command deployment:**
 ```bash
-docker-compose ps
+make deploy-all
 ```
 
-Or:
+This deploys:
+- ✅ Azure infrastructure (App Services, Container Registry, AI Services, Storage)
+- ✅ Docker containers for all services
+- ✅ Environment configuration
+- ✅ RBAC and managed identities
 
-```bash
-make ps
-```
+📖 **[Complete Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)**
 
-All services should show status as "Up":
-```
-NAME                    STATUS
-document-api            Up
-valet-api               Up
-document-demo-webui     Up
-```
+## 📋 What You'll Need
 
-### Step 7: Access the Application
+### For Local Development
+- Docker 20.10+
+- Docker Compose 2.0+
+- Azure subscriptions services:
+  - Document Intelligence (F0 or S0 SKU)
+  - Content Understanding (S0 SKU)  
+  - Storage Account (Standard LRS)
 
-Once all services are running, access them at:
+### Additional for Azure Deployment (Linux/macOS/WSL only)
+- Azure CLI 2.50+
+- jq 1.6+
+- make
+- bash 4.0+
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Web UI** | http://localhost:8080 | Main application interface |
-| **Document API** | http://localhost:8800/docs | Interactive API documentation (Swagger UI) |
-| **Valet API** | http://localhost:8000/docs | SAS token service API documentation |
+## 🎮 Usage
 
-## 🎮 Using the Application
-
-1. Open your browser and navigate to http://localhost:8080
-2. Upload a document (PDF, JPEG, or PNG) by:
-   - Dragging and dropping it into the upload area, or
-   - Clicking the upload area to browse files
-3. Select the analysis service:
-   - **Document Intelligence**: For general OCR and layout analysis
-   - **Content Understanding**: For advanced content extraction with custom models
+1. Open http://localhost:8080
+2. Drag & drop or select a document (PDF, JPEG, PNG)
+3. Choose analysis service (Document Intelligence or Content Understanding)
 4. Click "Analyze Document"
-5. View results in the JSON viewer panel
-6. Use the document preview panel to see the original document side-by-side
+5. View structured results in JSON viewer
 
-## 🔧 Useful Commands
-
-### View Logs
-
-Monitor all services:
-```bash
-docker-compose logs -f
-```
-
-Or individual services:
-```bash
-docker-compose logs -f document-api
-docker-compose logs -f valet-api
-docker-compose logs -f webui
-```
-
-With Makefile:
-```bash
-make logs              # All services
-make logs-document     # Document API only
-make logs-valet        # Valet API only
-make logs-webui        # Web UI only
-```
-
-### Restart Services
+## 🛠️ Common Commands
 
 ```bash
-docker-compose restart
+make up              # Start all services
+make down            # Stop all services
+make logs            # View logs
+make restart         # Restart services
+make rebuild         # Rebuild after code changes
+make clean           # Remove all containers and volumes
+
+# Azure deployment
+make deploy-all      # Deploy everything to Azure
+make deploy-infra    # Deploy infrastructure only
+make deploy-containers # Deploy containers only
 ```
 
-Or:
-```bash
-make restart
-```
+## 📚 Documentation
 
-### Stop Services
+| Document | Description |
+|----------|-------------|
+| **[Local Setup Guide](docs/LOCAL_SETUP.md)** | Detailed local development setup, troubleshooting, and commands |
+| **[Azure Deployment Guide](docs/AZURE_DEPLOYMENT.md)** | Complete Azure deployment walkthrough, configuration, and monitoring |
+| **[Architecture](docs/ARCHITECTURE.md)** | System design, components, patterns, and technology stack |
+| [API Integration Guide](src/webui/API_INTEGRATION.md) | API documentation and integration details |
+| [Fluent UI Guide](src/webui/FLUENT_UI_GUIDE.md) | UI component library reference |
 
-```bash
-docker-compose down
-```
+## ⚠️ Production Readiness
 
-Or:
-```bash
-make down
-```
+> **Note**: The Web UI was created as a demonstration and is **not recommended for production use**. For production, use modern frameworks like **React**, **Vue**, or **Angular** with proper:
+> - Component architecture and state management
+> - Comprehensive testing (unit, integration, e2e)
+> - Security hardening and authentication
+> - Performance optimization
+> - Accessibility compliance
 
-### Rebuild After Code Changes
+The backend APIs (Document API, Valet API) are production-ready FastAPI services.
 
-```bash
-docker-compose down
-docker-compose build
-docker-compose up -d
-```
+## 🔧 Technology Stack
 
-Or:
-```bash
-make rebuild
-```
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | HTML/CSS/JavaScript, Fluent UI |
+| **Backend** | Python 3.11+, FastAPI, Uvicorn |
+| **Infrastructure** | Docker, Docker Compose, Azure Bicep |
+| **Cloud Services** | Azure App Service, ACR, Document Intelligence, Storage |
 
-### Clean Up Everything
+##  Additional Resources
 
-Remove all containers, networks, and volumes:
-```bash
-docker-compose down -v
-docker system prune -f
-```
+- [Azure Document Intelligence Documentation](https://learn.microsoft.com/azure/ai-services/document-intelligence/)
+- [Azure Content Understanding Documentation](https://learn.microsoft.com/azure/ai-services/content-understanding/)
+- [Azure Storage Documentation](https://learn.microsoft.com/azure/storage/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Docker Documentation](https://docs.docker.com/)
 
-Or:
-```bash
-make clean
-```
+## 🤝 Contributing
 
-##  Additional Documentation
-
-- [API Integration Guide](src/webui/API_INTEGRATION.md) - Detailed API documentation
-- [Fluent UI Components](src/webui/FLUENT_UI_GUIDE.md) - UI component library guide
-- [Setup Guide](src/SETUP.md) - Detailed setup instructions
+Contributions are welcome! This is a demonstration project showcasing Azure AI capabilities.
 
 ## 📄 License
 
 See [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ to demonstrate Azure Document Intelligence and Content Understanding capabilities**
