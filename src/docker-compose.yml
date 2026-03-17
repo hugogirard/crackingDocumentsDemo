@@ -7,12 +7,8 @@ services:
     container_name: document-api
     ports:
       - "8800:8000"
-    environment:
-      - DOCUMENT_INTELLIGENCE_ENDPOINT=${DOCUMENT_INTELLIGENCE_ENDPOINT}
-      - DOCUMENT_INTELLIGENCE_API_KEY=${DOCUMENT_INTELLIGENCE_API_KEY}
-      - CONTENT_UNDERSTANDING_ENDPOINT=${CONTENT_UNDERSTANDING_ENDPOINT}
-      - CONTENT_UNDERSTANDING_API_VERSION=${CONTENT_UNDERSTANDING_API_VERSION}
-      - CONTENT_UNDERSTANDING_API_KEY=${CONTENT_UNDERSTANDING_API_KEY}
+    env_file:
+      - ./api/document-api/.env
     restart: unless-stopped
     networks:
       - app-network
@@ -25,9 +21,8 @@ services:
     container_name: valet-api
     ports:
       - "8000:8000"
-    environment:
-      - STORAGE_CONNECTION_STRING=${STORAGE_CONNECTION_STRING}
-      - STORAGE_ACCOUNT_KEY=${STORAGE_ACCOUNT_KEY}
+    env_file:
+      - ./api/valet-api/.env
     restart: unless-stopped
     networks:
       - app-network
