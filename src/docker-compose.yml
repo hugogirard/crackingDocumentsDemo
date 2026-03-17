@@ -1,0 +1,52 @@
+services:
+  # Document Intelligence API
+  document-api:
+    build:
+      context: ./api/document-api
+      dockerfile: Dockerfile
+    container_name: document-api
+    ports:
+      - "8800:8000"
+    environment:
+      - DOCUMENT_INTELLIGENCE_ENDPOINT=${DOCUMENT_INTELLIGENCE_ENDPOINT}
+      - DOCUMENT_INTELLIGENCE_API_KEY=${DOCUMENT_INTELLIGENCE_API_KEY}
+      - CONTENT_UNDERSTANDING_ENDPOINT=${CONTENT_UNDERSTANDING_ENDPOINT}
+      - CONTENT_UNDERSTANDING_API_VERSION=${CONTENT_UNDERSTANDING_API_VERSION}
+      - CONTENT_UNDERSTANDING_API_KEY=${CONTENT_UNDERSTANDING_API_KEY}
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Valet Key API (Storage SAS token service)
+  valet-api:
+    build:
+      context: ./api/valet-api
+      dockerfile: Dockerfile
+    container_name: valet-api
+    ports:
+      - "8000:8000"
+    environment:
+      - STORAGE_CONNECTION_STRING=${STORAGE_CONNECTION_STRING}
+      - STORAGE_ACCOUNT_KEY=${STORAGE_ACCOUNT_KEY}
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Web UI (NGINX)
+  webui:
+    build:
+      context: ./webui
+      dockerfile: Dockerfile
+    container_name: document-demo-webui
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - document-api
+      - valet-api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

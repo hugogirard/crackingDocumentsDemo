@@ -14,7 +14,7 @@ const CONFIG = {
     documentIntelligence: {
         analyzeEndpoint: '/api/chat/analyze',
         modelsEndpoint: '/api/chat/models',
-        processorType: 'doc', // Query parameter value for Document Intelligence
+        processorType: 'doc', // Query parameter value
         modelId: 'prebuilt-document'
     },
 
@@ -22,7 +22,7 @@ const CONFIG = {
     contentUnderstanding: {
         analyzeEndpoint: '/api/chat/analyze',
         modelsEndpoint: '/api/chat/models',
-        processorType: 'content', // Query parameter value for Content Understanding
+        processorType: 'content', // Query parameter value
         modelId: 'general-document'
     },
 
@@ -34,10 +34,6 @@ const CONFIG = {
 };
 
 // Export for use in app.js
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CONFIG;
-}
-
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CONFIG;
 }

@@ -1,6 +1,6 @@
 # Document Intelligence & Content Understanding Demo
 
-A pure HTML/CSS/JavaScript web application built with **Microsoft Fluent UI** for demonstrating Azure Document Intelligence and Content Understanding capabilities with LLM-powered document Q&A.
+A pure HTML/CSS/JavaScript web application built with **Microsoft Fluent UI** for demonstrating Azure Document Intelligence and Content Understanding capabilities.
 
 ## ✨ Design System
 
@@ -18,14 +18,12 @@ This application uses [**Fluent UI Web Components**](https://developer.microsoft
 - **fluent-card**: Elevated surfaces for upload area and file info
 - **fluent-select**: Dropdown for service selection
 - **fluent-text**: Typography with size and weight variants
-- **fluent-text-area**: Auto-resizing text input for chat
 - **fluent-progress-ring**: Loading indicator
 
 ## Features
 
 - 📄 **Document Upload**: Drag-and-drop or click to upload PDF, JPEG, or PNG files
 - 🔍 **Dual Analysis**: Choose between Document Intelligence or Content Understanding
-- 💬 **AI Chat**: Ask questions about your documents using LLM integration
 - 📊 **JSON Viewer**: View and copy the complete analysis response
 - 👁️ **Document Preview**: Side-by-side document viewing
 - 📱 **Responsive Design**: Works on desktop and mobile devices with Fluent UI components
@@ -41,12 +39,11 @@ src/webui/
 ├── app.js                  # Application initialization
 ├── config.js               # Configuration (API endpoints, settings)
 ├── config.template.js      # Configuration template for setup
-├── API_DOCUMENTATION.md    # Backend API contract documentation
+├── API_INTEGRATION.md      # Backend API integration documentation
 ├── services/               # Service layer (API calls)
 │   ├── azure-storage.service.js
 │   ├── document-intelligence.service.js
 │   ├── content-understanding.service.js
-│   ├── llm.service.js
 │   ├── notification.service.js
 │   └── loading.service.js
 ├── controllers/            # UI Controllers

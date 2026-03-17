@@ -1,0 +1,10 @@
+Dockerfile
+.dockerignore
+README.md
+API_DOCUMENTATION.md
+FLUENT_UI_GUIDE.md
+REFACTORING_SUMMARY.md
+.git
+.gitignore
+node_modules
+*.md

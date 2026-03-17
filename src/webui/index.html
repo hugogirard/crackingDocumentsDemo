@@ -127,25 +127,6 @@
                 </fluent-button>
             </div>
 
-            <!-- CHAT-MESSAGES: Part of chat.component -->
-            <div class="chat-section" id="chatSection" style="display: none;">
-                <div class="messages-container" id="messagesContainer">
-                    <!-- Messages will be dynamically added here -->
-                </div>
-
-                <div class="chat-input-container">
-                    <fluent-text-area id="chatInput" class="chat-input"
-                        placeholder="Ask a question about the document..." resize="vertical"
-                        rows="1"></fluent-text-area>
-                    <fluent-button appearance="accent" id="sendBtn" disabled class="send-btn" icon-only>
-                        <svg class="send-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2.5 3L18.5 10L2.5 17L5.5 10L2.5 3Z" fill="currentColor" />
-                            <path d="M5.5 10H12" stroke="white" stroke-width="1.5" stroke-linecap="round" />
-                        </svg>
-                    </fluent-button>
-                </div>
-            </div>
-
             <!-- LOADING-COMPONENT: Extract to loading-spinner.component -->
             <div class="loading-overlay" id="loadingOverlay" style="display: none;">
                 <fluent-progress-ring class="spinner"></fluent-progress-ring>
@@ -235,13 +216,11 @@
     <script src="services/azure-storage.service.js"></script>
     <script src="services/document-intelligence.service.js"></script>
     <script src="services/content-understanding.service.js"></script>
-    <script src="services/llm.service.js"></script>
     <script src="services/notification.service.js"></script>
     <script src="services/loading.service.js"></script>
 
     <!-- Controller Layer -->
     <script src="controllers/upload.controller.js"></script>
-    <script src="controllers/chat.controller.js"></script>
     <script src="controllers/json-viewer.controller.js"></script>
     <script src="controllers/document-preview.controller.js"></script>
     <script src="controllers/application.controller.js"></script>

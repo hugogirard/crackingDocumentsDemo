@@ -9,7 +9,6 @@ dist/
 build/
 
 # Configuration files with secrets
-config.js
 .env
 .env.local
 .env.production

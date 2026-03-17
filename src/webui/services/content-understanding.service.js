@@ -4,7 +4,7 @@
 class ContentUnderstandingService {
     constructor() {
         this.config = CONFIG.contentUnderstanding;
-        this.apiBaseUrl = CONFIG.apiBaseUrl;
+        this.apiBaseUrl = CONFIG.documentApiBaseUrl;
         this.timeout = CONFIG.app.analysisTimeout;
     }
 
@@ -18,50 +18,18 @@ class ContentUnderstandingService {
         console.log('Analyzing document with Content Understanding:', documentUrl);
         
         try {
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}`, {
+            // Use SAS URL from state if available
+            const sasUrl = stateService.getSasUrl();
+            const urlToAnalyze = sasUrl || documentUrl;
+            
+            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}?processor_type=${this.config.processorType}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    documentUrl: documentUrl,
-                    modelId: modelId || this.config.modelId
+                    url: urlToAnalyze
                 }),
-                signal: AbortSignal.timeout(this.timeout)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Analysis failed: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            console.log('Content Understanding analysis completed');
-            
-            return result;
-        } catch (error) {
-            console.error('Content Understanding error:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Analyze document from file directly
-     * @param {File} file - The file to analyze
-     * @param {string} modelId - Optional model ID
-     * @returns {Promise<Object>} Analysis result
-     */
-    async analyzeDocumentFromFile(file, modelId = null) {
-        console.log('Analyzing document file with Content Understanding:', file.name);
-        
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('modelId', modelId || this.config.modelId);
-
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/file`, {
-                method: 'POST',
-                body: formData,
                 signal: AbortSignal.timeout(this.timeout)
             });
 
@@ -86,7 +54,7 @@ class ContentUnderstandingService {
      */
     async getModels() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/models`);
+            const response = await fetch(`${this.apiBaseUrl}${this.config.modelsEndpoint}?processor_type=${this.config.processorType}`);
 
             if (!response.ok) {
                 throw new Error(`Failed to get models: ${response.statusText}`);

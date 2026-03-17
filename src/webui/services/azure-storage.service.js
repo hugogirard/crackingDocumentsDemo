@@ -4,7 +4,7 @@
 class AzureStorageService {
     constructor() {
         this.config = CONFIG.storage;
-        this.apiBaseUrl = CONFIG.apiBaseUrl;
+        this.apiBaseUrl = CONFIG.valetApiBaseUrl;
         this.timeout = CONFIG.app.uploadTimeout;
     }
 

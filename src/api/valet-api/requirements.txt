@@ -1,0 +1,7 @@
+aiohttp>=3.13.3
+azure-identity>=1.25.2
+azure-storage-blob>=12.28.0
+fastapi>=0.133.0
+fastapi-cli>=0.0.24
+gunicorn>=25.1.0
+python-dotenv>=1.2.1

@@ -4,7 +4,7 @@
 class DocumentIntelligenceService {
     constructor() {
         this.config = CONFIG.documentIntelligence;
-        this.apiBaseUrl = this.config.apiBaseUrl || CONFIG.apiBaseUrl;
+        this.apiBaseUrl = CONFIG.documentApiBaseUrl;
         this.timeout = CONFIG.app.analysisTimeout;
     }
 
@@ -22,7 +22,7 @@ class DocumentIntelligenceService {
         console.log('Analyzing document with Document Intelligence:', urlToAnalyze);
         
         try {
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}`, {
+            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}?processor_type=${this.config.processorType}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -49,47 +49,12 @@ class DocumentIntelligenceService {
     }
 
     /**
-     * Analyze document from file directly
-     * @param {File} file - The file to analyze
-     * @param {string} modelId - Optional model ID
-     * @returns {Promise<Object>} Analysis result
-     */
-    async analyzeDocumentFromFile(file, modelId = null) {
-        console.log('Analyzing document file with Document Intelligence:', file.name);
-        
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('modelId', modelId || this.config.modelId);
-
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/file`, {
-                method: 'POST',
-                body: formData,
-                signal: AbortSignal.timeout(this.timeout)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Analysis failed: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            console.log('Document analysis completed');
-            
-            return result;
-        } catch (error) {
-            console.error('Document Intelligence error:', error);
-            throw error;
-        }
-    }
-
-    /**
      * Get list of available models
      * @returns {Promise<Array>} List of available models
      */
     async getModels() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}${this.config.analyzeEndpoint}/models`);
+            const response = await fetch(`${this.apiBaseUrl}${this.config.modelsEndpoint}?processor_type=${this.config.processorType}`);
 
             if (!response.ok) {
                 throw new Error(`Failed to get models: ${response.statusText}`);

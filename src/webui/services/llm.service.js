@@ -4,7 +4,7 @@
 class LLMService {
     constructor() {
         this.config = CONFIG.llm;
-        this.apiBaseUrl = CONFIG.apiBaseUrl;
+        this.apiBaseUrl = CONFIG.valetApiBaseUrl;
         this.documentContext = null;
         this.conversationHistory = [];
     }
