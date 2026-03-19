@@ -6,26 +6,21 @@ The application consists of three main components in a microservices architectur
 
 ## System Architecture
 
-```
-┌─────────────┐
-│   Web UI    │ ← Microsoft Fluent UI (HTML/CSS/JS)
-│  (Port 8080)│
-└──────┬──────┘
-       │
-       ├──────────────────┬────────────────────┐
-       │                  │                    │
-       ▼                  ▼                    ▼
-┌─────────────┐   ┌──────────────┐   ┌──────────────┐
-│ Document API│   │  Valet API   │   │Azure Storage │
-│ (Port 8800) │   │ (Port 8000)  │   │   (Blobs)    │
-└──────┬──────┘   └──────┬───────┘   └──────────────┘
-       │                 │
-       ▼                 ▼
-┌──────────────────────────────────────┐
-│     Azure Cognitive Services         │
-│  • Document Intelligence             │
-│  • Content Understanding             │
-└──────────────────────────────────────┘
+```mermaid
+flowchart TD
+    UI["🌐 Web UI\n(Port 8080)\nMicrosoft Fluent UI (HTML/CSS/JS)"]
+
+    DAPI["📄 Document API\n(Port 8800)"]
+    VAPI["🔑 Valet API\n(Port 8000)"]
+    ST["🗄️ Azure Storage\n(Blobs)"]
+
+    ACS["☁️ Azure Cognitive Services\n• Document Intelligence\n• Content Understanding"]
+
+    UI -->|"Analyze document"| DAPI
+    UI -->|"Request SAS token"| VAPI
+    UI -->|"Direct upload via SAS"| ST
+    DAPI --> ACS
+    VAPI --> ST
 ```
 
 ## Components
@@ -155,24 +150,24 @@ Each component is independently deployable and scalable:
 
 ### Document Upload and Analysis Flow
 
-```
-1. User selects document in Web UI
-   ↓
-2. Web UI requests SAS token from Valet API
-   ↓
-3. Valet API generates SAS token and returns it
-   ↓
-4. Web UI uploads document directly to Azure Storage using SAS token
-   ↓
-5. Web UI sends analysis request to Document API with blob URL
-   ↓
-6. Document API calls Azure Document Intelligence/Content Understanding
-   ↓
-7. Azure service processes document and returns results
-   ↓
-8. Document API formats and returns results to Web UI
-   ↓
-9. Web UI displays results in JSON viewer
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Web UI
+    participant VAPI as Valet API
+    participant ST as Azure Storage
+    participant DAPI as Document API
+    participant ACS as Azure AI Services
+
+    U->>UI: Select document
+    UI->>VAPI: Request SAS token
+    VAPI-->>UI: Return SAS token
+    UI->>ST: Upload document directly (SAS)
+    UI->>DAPI: Send analysis request (blob URL)
+    DAPI->>ACS: Analyze document
+    ACS-->>DAPI: Return analysis results
+    DAPI-->>UI: Return formatted results
+    UI->>U: Display results in JSON viewer
 ```
 
 ## Network Communication
