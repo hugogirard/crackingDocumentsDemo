@@ -13,38 +13,27 @@ A comprehensive document analysis application demonstrating **Azure Document Int
 
 ## 📸 Screenshots
 
-### Application Interface
-
-<div align="center">
-
-#### Main Interface & Document Upload
-![Upload Interface](docs/images/home-interface.png)
-*Clean, intuitive interface with drag-and-drop document upload*
-
-#### Analysis Results with Split View
-![Results View](docs/images/results-view.png)
-*Side-by-side view: Original document preview and extracted JSON results*
-
-#### JSON Data Extraction
-![JSON Results](docs/images/json-results-detail.png)
-*Structured data extraction showing key-value pairs, tables, and content*
-
-#### API Documentation (Swagger UI)
-![API Documentation](docs/images/api-docs.png)
-*Interactive API documentation with FastAPI/Swagger*
-
-</div>
-
-> 📝 **Note:** Screenshots show the application running locally. See [Screenshots Guide](docs/SCREENSHOTS.md) for capturing your own.
+> 📝 **Note:** Screenshots are not yet available. Run the application locally and follow the [Screenshots Guide](docs/SCREENSHOTS.md) to capture and add them.
 
 ## 🏗️ Architecture
 
 **Three-tier microservices architecture:**
 
-```
-Web UI (Port 8080) → Document API (Port 8800) → Azure Document Intelligence
-                   ↓ Valet API (Port 8000)     → Azure Storage
-                                               → Azure Content Understanding
+```mermaid
+flowchart TD
+    UI["🌐 Web UI\n(Port 8080)\nHTML/CSS/JS + Fluent UI"]
+
+    DAPI["📄 Document API\n(Port 8800)\nPython FastAPI"]
+    VAPI["🔑 Valet API\n(Port 8000)\nPython FastAPI"]
+
+    DI["🧠 Azure Document Intelligence\n/ Content Understanding"]
+    ST["🗄️ Azure Blob Storage"]
+
+    UI -->|"Analyze document"| DAPI
+    UI -->|"Request SAS token"| VAPI
+    UI -->|"Upload directly via SAS"| ST
+    DAPI -->|"Process document"| DI
+    VAPI -->|"Generate SAS token"| ST
 ```
 
 - **Web UI**: JavaScript + Fluent UI for document upload and visualization
